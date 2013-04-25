@@ -331,7 +331,7 @@ class echemvisDialog(QDialog):
         if folderpath is None:
             self.dbdatasource=userinputDialog(self, inputs=[('DBsource?', bool, '1')], title='Change to 0 to read for local harddrive.')
             if self.dbdatasource:
-                self.dbc=dbcomm(user='mmarcin',password='lab231',db='hte_echemdrop_proto')
+                self.dbc=None#self.createdbsession()
                 
         else:
             self.dbdatasource=0
@@ -456,12 +456,16 @@ class echemvisDialog(QDialog):
         self.expmntLineEdit.setText('OCV0')
         
         folderButton=QPushButton()
-        folderButton.setText("select folder")
+        folderButton.setText("select\nfolder")
         QObject.connect(folderButton, SIGNAL("pressed()"), self.selectfolder)
         
         plotButton=QPushButton()
-        plotButton.setText("update figures")
+        plotButton.setText("update\nfigures")
         QObject.connect(plotButton, SIGNAL("pressed()"), self.calcandplot)
+        
+        updateButton=QPushButton()
+        updateButton.setText("update\ndata")
+        QObject.connect(updateButton, SIGNAL("pressed()"), self.calcandplotwithupdate)
         
         saveButton=QPushButton()
         saveButton.setText("save FOM\nspreadhseet")
@@ -472,8 +476,14 @@ class echemvisDialog(QDialog):
         QObject.connect(savesampleButton, SIGNAL("pressed()"), self.writesamplelist)
         
         savebuttonlayout=QHBoxLayout()
+        savebuttonlayout.addWidget(folderButton)
+        savebuttonlayout.addWidget(plotButton)
+        savebuttonlayout.addWidget(updateButton)
         savebuttonlayout.addWidget(saveButton)
         savebuttonlayout.addWidget(savesampleButton)
+#        savebuttonlayout=QHBoxLayout()
+#        savebuttonlayout.addWidget(saveButton)
+#        savebuttonlayout.addWidget(savesampleButton)
         
         self.infoLabel=QLabel()
         self.infodef='Q=10,15,40,80 1/nm -> \nd=0.63,0.42,0.16,0.079 nm\n'
@@ -596,9 +606,9 @@ class echemvisDialog(QDialog):
             templayout.addWidget(spw)
             ctrllayout.addLayout(templayout, i+1, j)
         
-        ctrllayout.addWidget(folderButton, 0, 0)
-        ctrllayout.addWidget(plotButton, 0, 1)
-        ctrllayout.addLayout(savebuttonlayout, 0, 2)
+#        ctrllayout.addWidget(folderButton, 0, 0)
+#        ctrllayout.addWidget(plotButton, 0, 1)
+        ctrllayout.addLayout(savebuttonlayout, 0, 0, 1, 4)
         
         ctrllayout.addWidget(self.revcmapCheckBox, i+2, 0)
         ctrllayout.addLayout(vminmaxlayout, i+2, 1)
@@ -642,13 +652,19 @@ class echemvisDialog(QDialog):
         else:
             self.folderpath=folderpath
         self.resize(1600, 750)
-        
     
+    def createdbsession(self):        
+        ans=userinputcaller(self, inputs=[('user:', str, 'mmarcin'), ('password:', str, '')], title='Enter database credentials', cancelallowed=True)
+        if ans is None:
+            return
+        self.dbc=dbcomm(user=ans[0].strip(), password=ans[1].strip(),db='hte_echemdrop_proto')
+        
     def selectfolder(self, plate_id=None, selectexids=None):
         self.statusLineEdit.setText('waiting for folder input')
         if self.dbdatasource:
-            self.dbc.db.close()
-            self.dbc=dbcomm(user='mmarcin',password='lab231',db='hte_echemdrop_proto')
+            if not self.dbc is None:
+                self.dbc.db.close()
+            self.createdbsession()
             
             if self.folderpath is None:
                 self.folderpath=mygetdir(self, markstr='select folder for saving results')
@@ -809,7 +825,7 @@ class echemvisDialog(QDialog):
             self.selectind=i
             d['FOM']=self.CalcFOM()
 
-    def get_techniquedictlist(self, ext='.txt', nfiles=99999):
+    def get_techniquedictlist(self, ext='.txt', nfiles=99999, dbupdate=False):
         self.statusLineEdit.setText('calculating FOM')
         dlist=[]
         existpaths=[d['path'] for d in self.techniquedictlist]
@@ -827,8 +843,10 @@ class echemvisDialog(QDialog):
                         self.expmntLineEdit.setText(technamedflt)
                         self.fillcalcoptions()
                         break
-            ##this line for getting updated data
-            self.selectfolder(plate_id=self.plate_id, selectexids=self.selectexids)
+            
+            if dbupdate:
+                ##this line for getting updated data
+                self.selectfolder(plate_id=self.plate_id, selectexids=self.selectexids)
             
             fns=self.dbrecarrd['dc_data__t_v_a_c_i'][self.dbrecarrd['technique_name']==techname]
             
@@ -878,8 +896,11 @@ class echemvisDialog(QDialog):
         f.close()
         return eval (s.partition('Epoch=')[2].partition('\n')[0].strip())
     
-    def calcandplot(self, ext='.txt'):
-        self.get_techniquedictlist(ext=ext)
+    def calcandplotwithupdate(self, ext='.txt'):
+        self.calcandplot(ext='.txt', dbupdate=True)
+        
+    def calcandplot(self, ext='.txt', dbupdate=False):
+        self.get_techniquedictlist(ext=ext, dbupdate=dbupdate)
         
         for i, d in enumerate(self.techniquedictlist):
             self.selectind=i
