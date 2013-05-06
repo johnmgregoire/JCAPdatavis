@@ -1,12 +1,12 @@
 import matplotlib.cm as cm
 import numpy
 import pylab
-import h5py, operator, copy, os, csv
+import h5py, operator, copy, os, csv, sys
 from echem_plate_fcns import *
 from echem_plate_math import *
 
-os.chdir('C:/Users/gregoire/Documents/PythonCode/ternaryplot')
-
+PyCodePath=os.path.split(os.path.split(os.path.realpath(__file__))[0])[0]
+sys.path.append(os.path.join(PyCodePath,'ternaryplot'))
 from myternaryutility import TernaryPlot
 from myquaternaryutility import QuaternaryPlot
 from quaternary_FOM_stackedtern import *

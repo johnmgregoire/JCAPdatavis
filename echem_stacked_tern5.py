@@ -17,7 +17,7 @@ from quaternary_FOM_bintern import *
 pylab.rc('font', family='serif', serif='Times New Roman')
 
 elkeys=['A', 'B', 'C', 'D']
-SYSTEM=60
+SYSTEM=45
 #29,34,39
 pointsize=20
 opacity=.6
@@ -785,221 +785,7 @@ elif SYSTEM==45:
     savefolder=os.path.join(os.getcwd(), expstr)
     binarylegloc=1
     elkeys=['Ni', 'Fe', 'Co', 'Ce']    
-elif SYSTEM==46:
-    ellabels=['Ni', 'Fe', 'Co', 'La']
-    os.chdir('C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoLa/results')
-    rootstr=''
-    expstr='ImaxCVLinSub'
-    fomlabel='max I (mA/cm$^2$)'
-    fomshift=0.
-    fommult=100000.
-    vmin=2
-    vmax=165
-    cmap=cm.jet
-    aboverangecolstr='.3'
-    belowrangecolstr='k'
-    savefolder=os.path.join(os.getcwd(), expstr)
-    binarylegloc=1
-    elkeys=['Ni', 'Fe', 'Co', 'La']
-elif SYSTEM==47:
-    ellabels=['Ni', 'Fe', 'Co', 'La']
-    os.chdir('C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoLa/results')
-    rootstr='_I350mVLinSub.txt'
-    expstr='I350mVLinSub'
-    fomlabel='I at 350mV vs E$_{OER}$ (mA/cm$^2$)'
-    fomshift=0.
-    fommult=100000.
-    vmin=1
-    vmax=30
-    cmap=cm.jet
-    aboverangecolstr='pink'
-    belowrangecolstr='k'
-    savefolder=os.path.join(os.getcwd(), expstr)
-    binarylegloc=1
-    elkeys=['Ni', 'Fe', 'Co', 'La']
-elif SYSTEM==48:
-    ellabels=['Ni', 'Fe', 'Co', 'La']
-    os.chdir('C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoLa/results')
-    rootstr='_I400mVLinSub.txt'
-    expstr='I400mVLinSub'
-    fomlabel='I at 400mV vs E$_{OER}$ (mA/cm$^2$)'
-    fomshift=0.
-    fommult=100000.
-    vmin=1
-    vmax=100
-    cmap=cm.jet
-    aboverangecolstr='.3'
-    belowrangecolstr='k'
-    savefolder=os.path.join(os.getcwd(), expstr)
-    binarylegloc=1
-    elkeys=['Ni', 'Fe', 'Co', 'La']    
-    
-
-
-elif SYSTEM==50:
-    ellabels=['Ni', 'Fe', 'Ce', 'La']
-    os.chdir('C:/Users/gregoire/Documents/EchemDropRawData/NiFeCeLa/results')
-    rootstr='_I350mVLinSub.txt'
-    expstr='I350mVLinSub'
-    fomlabel='I at 350mV vs E$_{OER}$ (mA/cm$^2$)'
-    fomshift=0.
-    fommult=100000.
-    vmin=1
-    vmax=30
-    cmap=cm.jet
-    aboverangecolstr='pink'
-    belowrangecolstr='k'
-    savefolder=os.path.join(os.getcwd(), expstr)
-    binarylegloc=1
-    elkeys=['Ni', 'Fe', 'Co', 'Ce']
-elif SYSTEM==51:
-    ellabels=['Ni', 'Fe', 'Ce', 'La']
-    os.chdir('C:/Users/gregoire/Documents/EchemDropRawData/NiFeCeLa/results')
-    rootstr='_I400mVLinSub.txt'
-    expstr='I400mVLinSub'
-    fomlabel='I at 400mV vs E$_{OER}$ (mA/cm$^2$)'
-    fomshift=0.
-    fommult=100000.
-    vmin=1
-    vmax=100
-    cmap=cm.jet
-    aboverangecolstr='pink'
-    belowrangecolstr='k'
-    savefolder=os.path.join(os.getcwd(), expstr)
-    binarylegloc=1
-    elkeys=['Ni', 'Fe', 'Co', 'Ce']
-
-elif SYSTEM==53:
-    ellabels=['Ni', 'Fe', 'Co', 'Ce']
-    os.chdir('C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoCe/results')
-    rootstr='_I350mVLinSub.txt'
-    expstr='I350mVLinSub'
-    fomlabel='I at 350mV vs E$_{OER}$ (mA/cm$^2$)'
-    fomshift=0.
-    fommult=100000.
-    vmin=1
-    vmax=10
-    cmap=cm.jet
-    aboverangecolstr='pink'
-    belowrangecolstr='k'
-    savefolder=os.path.join(os.getcwd(), expstr)
-    binarylegloc=1
-    elkeys=['Ni', 'Fe', 'Co', 'Ce']
-elif SYSTEM==54:
-    ellabels=['Ni', 'Fe', 'Co', 'Ce']
-    os.chdir('C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoCe/results')
-    rootstr='_I400mVLinSub.txt'
-    expstr='I400mVLinSub'
-    fomlabel='I at 400mV vs E$_{OER}$ (mA/cm$^2$)'
-    fomshift=0.
-    fommult=100000.
-    vmin=1
-    vmax=42
-    cmap=cm.jet
-    aboverangecolstr='pink'
-    belowrangecolstr='k'
-    savefolder=os.path.join(os.getcwd(), expstr)
-    binarylegloc=1
-    elkeys=['Ni', 'Fe', 'Co', 'Ce']
-
-elif SYSTEM==55:
-    ellabels=['Ni', 'Fe', 'Co', 'Ce']
-    os.chdir('C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoCe/results')
-    rootstr='_V_IthreshCVLinSub_30.txt'
-    expstr='V_IthreshCVLinSub_30'
-    fomlabel='E for 3mA/cm$^2$ (mV vs E$_{OER}$)'
-    fomshift=0.
-    fommult=1000.
-    vmin=280
-    vmax=400
-    cmap=cm.jet_r
-    aboverangecolstr='k'
-    belowrangecolstr='pink'
-    savefolder=os.path.join(os.getcwd(), expstr)
-    binarylegloc=1
-    elkeys=['Ni', 'Fe', 'Co', 'Ce']
-
-elif SYSTEM==56:
-    ellabels=['Ni', 'Fe', 'Co', 'Ce']
-    os.chdir('C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoCe/results')
-    rootstr='_V_IthreshCVLinSub_100.txt'
-    expstr='V_IthreshCVLinSub_100'
-    fomlabel='E for 10mA/cm$^2$ (mV vs E$_{OER}$)'
-    fomshift=0.
-    fommult=1000.
-    vmin=350
-    vmax=440
-    cmap=cm.jet_r
-    aboverangecolstr='k'
-    belowrangecolstr='pink'
-    savefolder=os.path.join(os.getcwd(), expstr)
-    binarylegloc=1
-    elkeys=['Ni', 'Fe', 'Co', 'Ce']
-elif SYSTEM==57:
-    ellabels=['Ni', 'Fe', 'Co', 'Ce']
-    os.chdir('C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoCe/results')
-    rootstr='_V_IthreshCVLinSub_300.txt'
-    expstr='V_IthreshCVLinSub_300'
-    fomlabel='E for 30mA/cm$^2$ (mV vs E$_{OER}$)'
-    fomshift=0.
-    fommult=1000.
-    vmin=380
-    vmax=440
-    cmap=cm.jet_r
-    aboverangecolstr='k'
-    belowrangecolstr='pink'
-    savefolder=os.path.join(os.getcwd(), expstr)
-    binarylegloc=1
-    elkeys=['Ni', 'Fe', 'Co', 'Ce']
-elif SYSTEM==58:
-    ellabels=['Ni', 'Fe', 'Co', 'Ce']
-    os.chdir('C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoCe/results')
-    rootstr='_TafelSlopeVperdec.txt'
-    expstr='TafelSlopeVperdec'
-    fomlabel='Tafel mV/decade'
-    fomshift=0.
-    fommult=1000.
-    vmin=25.
-    vmax=105.
-    cmap=cm.jet_r
-    aboverangecolstr='pink'
-    belowrangecolstr='k'
-    savefolder=os.path.join(os.getcwd(), expstr)
-    binarylegloc=1
-    elkeys=['Ni', 'Fe', 'Co', 'Ce']
-elif SYSTEM==59:
-    ellabels=['Ni', 'Fe', 'Co', 'Ce']
-    os.chdir('C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoCe/results')
-    rootstr='_TafelLogExCurrent.txt'
-    expstr='TafelLogExCurrent'
-    fomlabel='Tafel Log$_{10}$ I$_{ex}$/A'
-    fomshift=0.
-    fommult=1.
-    vmin=-18.
-    vmax=-8.
-    cmap=cm.jet
-    aboverangecolstr='pink'
-    belowrangecolstr='k'
-    savefolder=os.path.join(os.getcwd(), expstr)
-    binarylegloc=1
-    elkeys=['Ni', 'Fe', 'Co', 'Ce']
-
-elif SYSTEM==60:
-    ellabels=['Ni', 'Fe', 'Co', 'Ce']
-    os.chdir('C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoCe/parsedresults/fom0.04_plate123')
-    rootstr='V_IthreshCVLinSub_100'
-    expstr='V_IthreshCVLinSub_100'
-    fomlabel='E for 10mA/cm$^2$ (mV vs E$_{OER}$)'
-    fomshift=0.
-    fommult=1000.
-    vmin=350
-    vmax=440
-    cmap=cm.jet_r
-    aboverangecolstr='k'
-    belowrangecolstr='pink'
-    savefolder=os.path.join(os.getcwd(), expstr)
-    binarylegloc=1
-    elkeys=['Ni', 'Fe', 'Co', 'Ce']
+ 
     
 dpl=['', '', '']
 for root, dirs, files in os.walk(os.getcwd()):
@@ -1250,8 +1036,6 @@ if SYSTEM==1:
 if SYSTEM==6:
     axbin.set_ylim(.38, .5)
 
-if not os.path.exists(savefolder):
-    os.mkdir(savefolder)
 os.chdir(savefolder)
 if 1:
     pylab.figure(fig.number)
@@ -1278,7 +1062,7 @@ if 1:
     pylab.figure(purelfig.number)
     pylab.savefig('%s_pureelements.png' %expstr)
 
-if 0:
+if 1:
     os.chdir(savefolder)
     pylab.figure(fig.number)
     pylab.savefig('%s_PlatesAll_Posn.eps' %expstr)

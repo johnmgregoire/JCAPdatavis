@@ -1,5 +1,5 @@
 import matplotlib.cm as cm
-import numpy
+import numpy, pickle
 import pylab
 import h5py, operator, copy, os, csv, sys
 from echem_plate_fcns import *
@@ -17,7 +17,7 @@ from quaternary_FOM_bintern import *
 pylab.rc('font', family='serif', serif='Times New Roman')
 
 elkeys=['A', 'B', 'C', 'D']
-SYSTEM=60
+SYSTEM=70
 #29,34,39
 pointsize=20
 opacity=.6
@@ -27,7 +27,7 @@ labelquat=True
 #permuteelements=[1, 2, 0, 3]
 permuteelements=[0, 1, 2, 3]
 allposn=True
-
+linedpath=None
 if SYSTEM==0:
     ellabels=['Fe', 'Co', 'Ni', 'Ti']
     os.chdir('C:/Users/Gregoire/Documents/CaltechWork/echemdrop')
@@ -987,7 +987,9 @@ elif SYSTEM==59:
 elif SYSTEM==60:
     ellabels=['Ni', 'Fe', 'Co', 'Ce']
     os.chdir('C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoCe/parsedresults/fom0.04_plate123')
-    rootstr='V_IthreshCVLinSub_100'
+    linedpath='C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoCe/parsedresults/201304NiFeCoCe_compline0.04_linedetails.dat'
+    linedsmoothfcn=lambda x, y: scipy.interpolate.splev(x, scipy.interpolate.splrep(x=x, y=y, k=5, s=3000))
+    rootstr='fom0.04'
     expstr='V_IthreshCVLinSub_100'
     fomlabel='E for 10mA/cm$^2$ (mV vs E$_{OER}$)'
     fomshift=0.
@@ -1000,6 +1002,103 @@ elif SYSTEM==60:
     savefolder=os.path.join(os.getcwd(), expstr)
     binarylegloc=1
     elkeys=['Ni', 'Fe', 'Co', 'Ce']
+    
+elif SYSTEM==61:
+    ellabels=['Ni', 'Fe', 'Co', 'Ce']
+    os.chdir('C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoCe/parsedresults/fom0.04_plate123')
+    linedpath='C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoCe/parsedresults/201304NiFeCoCe_compline0.04_linedetails.dat'
+    #linedsmoothfcn=lambda x, y: savgolsmooth(y, nptsoneside=18, order = 2)
+    linedsmoothfcn=lambda x, y: scipy.interpolate.splev(x, scipy.interpolate.splrep(x=x, y=y, k=5, s=3000))
+    
+    rootstr='fom0.04'
+    expstr='I400mVLinSub'
+    fomlabel='I at 400mV vs E$_{OER}$ (mA/cm$^2$)'
+    fomshift=0.
+    fommult=100000.
+    vmin=1
+    vmax=42
+    cmap=cm.jet
+    aboverangecolstr='k'
+    belowrangecolstr='pink'
+    savefolder=os.path.join(os.getcwd(), expstr)
+    binarylegloc=1
+    elkeys=['Ni', 'Fe', 'Co', 'Ce']
+
+elif SYSTEM==62:
+    ellabels=['Ni', 'Fe', 'Co', 'Ce']
+    os.chdir('C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoCe/parsedresults/fom0.06_plate123')
+    linedpath='C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoCe/parsedresults/201304NiFeCoCe_compline0.06_linedetails.dat'
+    #linedsmoothfcn=lambda x, y: savgolsmooth(y, nptsoneside=12, order = 2)
+    #linedsmoothfcn=lambda x, y: scipy.interpolate.UnivariateSpline(x=x, y=y, k=5)(x)
+    linedsmoothfcn=lambda x, y: scipy.interpolate.splev(x, scipy.interpolate.splrep(x=x, y=y, k=5, s=3000))
+    rootstr='fom0.06'
+    expstr='I350mVLinSub'
+    fomlabel='I at 350mV vs E$_{OER}$ (mA/cm$^2$)'
+    fomshift=0.
+    fommult=100000.
+    vmin=1
+    vmax=10
+    cmap=cm.jet
+    aboverangecolstr='k'
+    belowrangecolstr='pink'
+    savefolder=os.path.join(os.getcwd(), expstr)
+    binarylegloc=1
+    elkeys=['Ni', 'Fe', 'Co', 'Ce']
+    
+elif SYSTEM==63:
+    ellabels=['Ni', 'Fe', 'Co', 'Ce']
+    os.chdir('C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoCe/parsedresults/fom0.06_plate123')
+    linedpath='C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoCe/parsedresults/201304NiFeCoCe_compline0.06_linedetails.dat'
+    linedsmoothfcn=lambda x, y: scipy.interpolate.splev(x, scipy.interpolate.splrep(x=x, y=y, k=5, s=3000))
+    rootstr='fom0.06'
+    expstr='I400mVLinSub'
+    fomlabel='I at 400mV vs E$_{OER}$ (mA/cm$^2$)'
+    fomshift=0.
+    fommult=100000.
+    vmin=1
+    vmax=42
+    cmap=cm.jet
+    aboverangecolstr='k'
+    belowrangecolstr='pink'
+    savefolder=os.path.join(os.getcwd(), expstr)
+    binarylegloc=1
+    elkeys=['Ni', 'Fe', 'Co', 'Ce']
+    
+elif SYSTEM==65:
+    ellabels=['Ni', 'Fe', 'Co', 'Ce']
+    os.chdir('C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoCe/parsedresults/fom0.02_plate123')
+    linedpath='C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoCe/parsedresults/201304NiFeCoCe_compline0.02_linedetails.dat'
+    linedsmoothfcn=lambda x, y: scipy.interpolate.splev(x, scipy.interpolate.splrep(x=x, y=y, k=5, s=3000))
+    rootstr='fom0.02'
+    expstr='I400mVLinSub'
+    fomlabel='I at 400mV vs E$_{OER}$ (mA/cm$^2$)'
+    fomshift=0.
+    fommult=100000.
+    vmin=1
+    vmax=42
+    cmap=cm.jet
+    aboverangecolstr='k'
+    belowrangecolstr='pink'
+    savefolder=os.path.join(os.getcwd(), expstr)
+    binarylegloc=1
+    elkeys=['Ni', 'Fe', 'Co', 'Ce']
+
+elif SYSTEM==70:
+    ellabels=['Ce', 'Fe', 'Co', 'Ni']
+    os.chdir('C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoCe/results')
+    rootstr='_I400mVLinSub.txt'
+    expstr='I400mVLinSub'
+    fomlabel='I at 400mV vs E$_{OER}$ (mA/cm$^2$)'
+    fomshift=0.
+    fommult=100000.
+    vmin=1
+    vmax=42
+    cmap=cm.jet
+    aboverangecolstr='pink'
+    belowrangecolstr='k'
+    savefolder=os.path.join(os.getcwd(), expstr+'_Ni')
+    binarylegloc=1
+    elkeys=['Ce', 'Fe', 'Co', 'Ni']
     
 dpl=['', '', '']
 for root, dirs, files in os.walk(os.getcwd()):
@@ -1245,6 +1344,36 @@ pylab.ylabel(fomlabel, fontsize=16)
 pylab.title('PURE ELEMENTS. color=element(CMYK). #=thickness', fontsize=18)
 pylab.legend(loc=1)
 
+if linedpath is None:
+    axlinepar=None
+else:
+    f=open(linedpath, mode='r')
+    lined=pickle.load(f)
+    f.close()
+    pylab.figure()
+    lp=lined['lineparameter'][code0inds]
+#    lp[lp<0.]=0.
+#    lp[lp>1.]=1.
+    fom=fomall[code0inds]
+    argsinds=numpy.argsort(lp)
+    pylab.plot(lp[argsinds], fom[argsinds], 'b-')
+    pylab.plot(lp[argsinds], fom[argsinds], 'bo')
+    if not linedsmoothfcn is None:
+        fomsmooth=linedsmoothfcn(lp[argsinds], fom[argsinds])
+        pylab.plot(lp[argsinds], fomsmooth, 'k-')
+    axlinepar=pylab.gca()
+    lineparticks=numpy.linspace(0, 1, 4)
+    tl=[]
+    for i in lineparticks:
+        c=lined['compend1']+(lined['compend2']-lined['compend1'])*i
+        tl+=[stpquat.singlelabeltext(c)]
+    pylab.xlim(0, 1)
+    #pylab.ylim(vmin, vmax)
+    axlinepar.xaxis.set_ticks(lineparticks)
+    axlinepar.xaxis.set_ticklabels(tl)
+    pylab.ylabel(fomlabel)
+
+
 if SYSTEM==1:
     axbin.set_ylim(.23, .7)
 if SYSTEM==6:
@@ -1277,7 +1406,10 @@ if 1:
     
     pylab.figure(purelfig.number)
     pylab.savefig('%s_pureelements.png' %expstr)
-
+    if not axlinepar is None:
+        pylab.figure(axlinepar.figure.number)
+        pylab.savefig('%s_compline.png' %expstr)
+    
 if 0:
     os.chdir(savefolder)
     pylab.figure(fig.number)
@@ -1299,6 +1431,10 @@ if 0:
     
     pylab.figure(purelfig.number)
     pylab.savefig('%s_pureelements.eps' %expstr)
+
+    if not axlinepar is None:
+        pylab.figure(axlinepar.figure.number)
+        pylab.savefig('%s_compline.eps' %expstr)
 if 0:
     pylab.figure(stpquat.ax.figure.number)
     pylab.savefig('%s_PlatesAll_Quat_hires.png' %expstr, dpi=600)

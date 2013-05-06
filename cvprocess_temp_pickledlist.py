@@ -52,11 +52,48 @@ import pickle
 #os.chdir('C:/Users/Gregoire/Documents/CaltechWork/echemdrop/20121031NiFeCoTi_P/results/plate2/LinSubPlots')
 #savefolder='C:/Users/Gregoire/Documents/CaltechWork/echemdrop/20121031NiFeCoTi_P/results/plate2'
 
-p='C:/Users/Gregoire/Documents/CaltechWork/echemdrop/20121031NiFeCoTi_P/results/20121031NiFeCoTi_P_plate1_dlist.dat'#
-os.chdir('C:/Users/Gregoire/Documents/CaltechWork/echemdrop/20121031NiFeCoTi_P/results/plate1/LinSubPlots')
-savefolder='C:/Users/Gregoire/Documents/CaltechWork/echemdrop/20121031NiFeCoTi_P/results/plate1'
+#p='C:/Users/Gregoire/Documents/CaltechWork/echemdrop/20121031NiFeCoTi_P/results/20121031NiFeCoTi_P_plate1_dlist.dat'#
+#os.chdir('C:/Users/Gregoire/Documents/CaltechWork/echemdrop/20121031NiFeCoTi_P/results/plate1/LinSubPlots')
+#savefolder='C:/Users/Gregoire/Documents/CaltechWork/echemdrop/20121031NiFeCoTi_P/results/plate1'
 
-vshift=0#.-.177#-.24
+#pl=1
+#os.chdir('C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoLa/results/plate%d/LinSubPlots'%pl)
+#savefolder='C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoLa/results/plate%d' %pl
+#if pl==1:
+#    p='C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoLa/results/20130425 NiFeCoLa_plate1_5959_dlist.dat';vshift=-(.187-.030)
+#elif pl==2:
+#    p='C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoLa/results/20130426NiFeCoLa_plate2_5904_dlist.dat';vshift=-(.187-.028)
+#elif pl==3:
+#    p='C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoLa/results/20130427 NiFeCoLa_plate3_5791_dlist.dat';vshift=-(.187-.005)
+
+#pl=3
+#os.chdir('C:/Users/gregoire/Documents/EchemDropRawData/NiFeCeLa/results/plate%d/LinSubPlots'%pl)
+#savefolder='C:/Users/gregoire/Documents/EchemDropRawData/NiFeCeLa/results/plate%d' %pl
+#if pl==1:
+#    p='C:/Users/gregoire/Documents/EchemDropRawData/NiFeCeLa/results/20130423 NiFeCeLa_plate1_5836_dlist.dat';vshift=-(.187-.005)
+#elif pl==2:
+#    p='C:/Users/gregoire/Documents/EchemDropRawData/NiFeCeLa/results/20130424 NiFeCeLa_plate2 5825 B_dlist.dat';vshift=-(.187-0.)
+#elif pl==3:
+#    p='C:/Users/gregoire/Documents/EchemDropRawData/NiFeCeLa/results/20130425 NiFeCeLa_plate3_5847_dlist.dat';vshift=-(.187-.034)
+
+
+#pl=3
+#os.chdir('C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoCe/results/plate%d/LinSubPlots'%pl)
+#savefolder='C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoCe/results/plate%d' %pl
+#if pl==1:
+#    p='C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoCe/results/20130402NiFeCoCe_Plate1_5500_dlist.dat';vshift=-(.187-.0)
+#elif pl==2:
+#    p='C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoCe/results/20130403NiFeCoCe_Plate2_5498_dlist.dat';vshift=-(.187-0)
+#elif pl==3:
+#    p='C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoCe/results/20130403NiFeCoCe_Plate3_4835_dlist.dat';vshift=-(.187-0)
+    
+
+os.chdir('C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoCe/parsedresults/LinSubPlots0.02')
+savefolder='C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoCe/parsedresults/fom0.02_plate123'
+p='C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoCe/parsedresults/201304NiFeCoCe_compline0.02_plate123_dlist.dat';vshift=-(.187-.0)
+    
+    
+#vshift=0#.-.177#-.24
 
 f=open(p, mode='r')
 dlist=pickle.load(f)
@@ -72,27 +109,27 @@ smpall=numpy.array([d['Sample'] for d in dlist])
 dinds=numpy.argsort(smpall)
 plotcount=0
 smpl=[]
-pylab.figure()
-for di in dinds:
-    d=dlist[di]
-    if plotcount==10:
-        s='_'.join([`smp` for smp in smpl])
-        pylab.title(s)
-        pylab.savefig(s)
-        plotcount=0
-        smpl=[]
-        pylab.figure()
-    
-    for segd in d['segprops_dlist']:#[2:3]:
-        x=d['Ewe(V)'][segd['inds']]
-        y1=d['I(A)'][segd['inds']]
-        y2=d['I(A)_LinSub'][segd['inds']]
-        pylab.plot(x, y1, '--', color=cols[plotcount])
-        pylab.plot(x, y1-y2, ':', color=cols[plotcount])
-        pylab.plot(x, y2, '-', color=cols[plotcount])
-        break
-    smpl+=[d['Sample']]
-    plotcount+=1
+#pylab.figure()
+#for di in dinds:
+#    d=dlist[di]
+#    if plotcount==10:
+#        s='_'.join([`smp` for smp in smpl])
+#        pylab.title(s)
+#        pylab.savefig(s)
+#        plotcount=0
+#        smpl=[]
+#        pylab.figure()
+#    
+#    for segd in d['segprops_dlist']:#[2:3]:
+#        x=d['Ewe(V)'][segd['inds']]
+#        y1=d['I(A)'][segd['inds']]
+#        y2=d['I(A)_LinSub'][segd['inds']]
+#        pylab.plot(x, y1, '--', color=cols[plotcount])
+#        pylab.plot(x, y1-y2, ':', color=cols[plotcount])
+#        pylab.plot(x, y2, '-', color=cols[plotcount])
+#        break
+#    smpl+=[d['Sample']]
+#    plotcount+=1
 
 
 ###making 6-sample plots of linear subtraction
@@ -179,27 +216,35 @@ for di in dinds:
 ##calculate V for critical I, etc
 for d in dlist:
     inds=d['segprops_dlist'][0]['inds']
-    d['CV6fwdImax']=numpy.max(d['I(A)'][inds])
+    #d['CV4fwdImax']=numpy.max(d['I(A)'][inds])
     i=d['I(A)_LinSub'][inds]
     v=d['Ewe(V)'][inds]
     d['ImaxCVLinSub']=numpy.max(i)
-#    vsh=v+vshift
+    vsh=v+vshift
 #    aveinds=numpy.where((vsh>.495)&(vsh<=.505))
 #    d['I500mVoverpotLinSub']=numpy.mean(i[aveinds])
     aveinds=numpy.where((v>.645)&(v<=.655))
     d['I650mVLinSub']=numpy.mean(i[aveinds])
+    
+    vanl=[.3, .35, .4]
+    var=vsh
+    for van in vanl:
+        k='I%dmVLinSub' %(van*1000.,)
+        aveinds=numpy.where((var>van-.005)&(var<=van+.005))
+        d[k]=numpy.mean(i[aveinds])
+    
 #    aveinds=numpy.where((v>.695)&(v<=.705))
 #    d['I700mVLinSub']=numpy.mean(i[aveinds])
     
-    #vsh=v+vshift
-    aveinds=numpy.where((v>.672)&(v<=.682))
-    d['I677mVLinSub']=numpy.mean(i[aveinds])
+#    #vsh=v+vshift
+#    aveinds=numpy.where((v>.672)&(v<=.682))
+#    d['I677mVLinSub']=numpy.mean(i[aveinds])
+#    
+#    aveinds=numpy.where((v>.622)&(v<=.632))
+#    d['I627mVLinSub']=numpy.mean(i[aveinds])
     
-    aveinds=numpy.where((v>.622)&(v<=.632))
-    d['I627mVLinSub']=numpy.mean(i[aveinds])
-    
-    aveinds=numpy.where((v>.572)&(v<=.582))
-    d['I577mVLinSub']=numpy.mean(i[aveinds])
+#    aveinds=numpy.where((v>.572)&(v<=.582))
+#    d['I577mVLinSub']=numpy.mean(i[aveinds])
 #    ###requirement to be above critical current for n consecutive points
 #    icrit=1.e-4
 #    b=numpy.int16(i>=icrit)
@@ -211,9 +256,24 @@ for d in dlist:
 #    else:
 #        d['V_IthreshCVLinSub']=numpy.nan
 #    
-    
+
     ###requirement to be above critical current for rest of scan with n outliers
-    nout=10
+    nout=5
+    icrit=3.e-4
+    k='V_IthreshCVLinSub_%d' %(icrit*1.e6)
+    b=numpy.where(i<icrit)[0]
+    if (len(i)-len(b))<(nout+1) or numpy.all(i[-nout:]<icrit):
+        d[k]=numpy.nan
+    else:
+        if len(b)==0:
+            ind=0
+        else:
+            ind=b[-nout]
+            ind+=nout-1
+        d[k]=var[max(0, ind-4):ind+4].mean()
+        
+    ###requirement to be above critical current for rest of scan with n outliers
+    nout=5
     icrit=1.e-4
     k='V_IthreshCVLinSub_%d' %(icrit*1.e6)
     b=numpy.where(i<icrit)[0]
@@ -225,11 +285,11 @@ for d in dlist:
         else:
             ind=b[-nout]
             ind+=nout-1
-        d[k]=v[ind]
+        d[k]=var[max(0, ind-4):ind+4].mean()
         
 
-    nout=10
-    icrit=2.e-4
+    nout=5
+    icrit=3.e-5
     k='V_IthreshCVLinSub_%d' %(icrit*1.e6)
     b=numpy.where(i<icrit)[0]
     if (len(i)-len(b))<(nout+1) or numpy.all(i[-nout:]<icrit):
@@ -240,9 +300,12 @@ for d in dlist:
         else:
             ind=b[-nout]
             ind+=nout-1
-        d[k]=v[ind]
+        d[k]=var[max(0, ind-4):ind+4].mean()
+    
+
+
 #savekeys=['SegIndStart_LinSub','LinLen_LinSub','Intercept_LinSub','dIdt_LinSub', 'ImaxCVLinSub', 'V_IthreshCVLinSub', 'I500mVoverpotLinSub']
-savekeys=['SegIndStart_LinSub','LinLen_LinSub','Intercept_LinSub','dIdt_LinSub', 'ImaxCVLinSub', 'I650mVLinSub', 'I677mVLinSub','CV6fwdImax', 'V_IthreshCVLinSub_100', 'V_IthreshCVLinSub_200', 'I627mVLinSub', 'I577mVLinSub']
+savekeys=['SegIndStart_LinSub','LinLen_LinSub','Intercept_LinSub','dIdt_LinSub', 'ImaxCVLinSub', 'V_IthreshCVLinSub_300',  'V_IthreshCVLinSub_100', 'V_IthreshCVLinSub_30', 'I300mVLinSub', 'I350mVLinSub', 'I400mVLinSub']#'CV6fwdImax', 'I627mVLinSub', 'I577mVLinSub']
 
 
 mainapp=QApplication(sys.argv)

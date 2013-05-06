@@ -50,7 +50,7 @@ import pickle
 
 
 
-pl=2
+pl=1
 os.chdir('C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoCe/results/plate%d/LogLinSubPlots'%pl)
 savefolder='C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoCe/results/plate%d' %pl
 if pl==1:
@@ -91,9 +91,9 @@ SegSG_dlist(dlist, SGpts=SGpts, order=1, k='I(A)_LinSub')
 ##calculate V for critical I, etc
 for count, d in enumerate(dlist):
     inds=d['segprops_dlist'][0]['inds']
-    d['CV6fwdImax']=numpy.max(d['I(A)'][inds])
+    #d['CV6fwdImax']=numpy.max(d['I(A)'][inds])
     i=d['I(A)_LinSub_SG'][inds]
-    v=d['Ewe(V)'][inds]
+    v=d['Ewe(V)'][inds]+vshift
     posinds=numpy.where(i>5e-8)
     invboolarr=numpy.float32(i<=5.e-8)
     istart_segs, len_segs, fitdy_segs, fitinterc_segs=findzerosegs(invboolarr, booldev_frac,  booldev_nout, booldn_segstart,  SGnpts=10, plotbool=False, dx=1., maxfracoutliers=.5)
@@ -119,12 +119,34 @@ for count, d in enumerate(dlist):
     tafinds=numpy.arange(i0, i1)
     it=il[tafinds]
     vt=v[tafinds]
-    
+    fitdy, fitint=numpy.polyfit(vt, it, 1)
+#    fitx=numpy.array([v.min(), v.max()])
+#    fity=fitint+fitdy*fitx
     
     d['segprops_dlist'][0]['TafelInds']=inds[taffitinds][tafinds]
-    d['segprops_dlist'][0]['TafelSlope']=fitdy_segs[ind]
-    d['segprops_dlist'][0]['TafelEstart_TafelValue']=(v[0], fitinterc_segs[ind])
+    d['TafelSlopeVperdec']=1./fitdy
+    d['TafelEstart_TafelValue']=v[0]
+    d['TafelFitVrange']=vt.max()-vt.min()
+    d['TafelLogExCurrent']=fitint
     
+#    for segd in d['segprops_dlist']:#[2:3]:
+#        for st, k in zip([':', '--', '-'], ['inds', 'TafelFitInds', 'TafelInds']):
+#            if not k in segd.keys():
+#                continue
+#            x=d['Ewe(V)'][segd[k]]+vshift
+#            y=d['I(A)_LinSub'][segd[k]]
+#            posinds=numpy.where(y>5e-8)
+#            x=x[posinds]
+#            y=numpy.log10(y[posinds])
+#            pylab.plot(x, y, st)
+#        break
+#    pylab.plot(fitx, fity, 'y-')
+#    print 1./fitdy, fitdy, fitint
+#    
+#    break
+#pylab.show()
+#    
+#    
 
 ##making 10-sample plots of linear subtraction
 cols=['k','b', 'g', 'r', 'c', 'm', 'y', 'brown', 'purple', 'grey']
@@ -158,24 +180,29 @@ for di in dinds:
     plotcount+=1
 
 
-#savekeys=['SegIndStart_LinSub','LinLen_LinSub','Intercept_LinSub','dIdt_LinSub', 'ImaxCVLinSub', 'V_IthreshCVLinSub', 'I650mVLinSub', 'CV6fwdImax']
-#
-#
-#mainapp=QApplication(sys.argv)
-#form=MainMenu(None, execute=False, folderpath=savefolder)
-#echemvis=form.echem
-#echemvis.techniquedictlist=dlist
-#
-#
-#def savefom(dlist, savefolder, key):
-#    for d in dlist:
-#        d['FOM']=d[key]
-#    echemvis.writefile(p=savefolder, explab=key)
-#
-#for skey in savekeys:
-#    savefom(echemvis.techniquedictlist, savefolder, skey)
+savekeys=['TafelSlopeVperdec','TafelEstart_TafelValue','TafelFitVrange','TafelLogExCurrent']
 
-if 0:
+
+mainapp=QApplication(sys.argv)
+form=MainMenu(None, execute=False, folderpath=savefolder)
+echemvis=form.echem
+echemvis.techniquedictlist=dlist
+
+
+def savefom(dlist, savefolder, key):
+    for d in dlist:
+        if key in d.keys():
+            d['FOM']=d[key]
+        else:
+            d['FOM']=numpy.nan
+            d[key]=numpy.nan
+
+    echemvis.writefile(p=savefolder, explab=key)
+
+for skey in savekeys:
+    savefom(echemvis.techniquedictlist, savefolder, skey)
+    
+if 1:
     f=open(p, mode='w')
     pickle.dump(dlist, f)
     f.close()

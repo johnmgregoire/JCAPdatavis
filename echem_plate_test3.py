@@ -21,8 +21,19 @@ from echem_plate_math import *
 #p='C:/Users/Gregoire/Documents/CaltechWork/echemdrop/20121031NiFeCoAl_P/20121031NiFeCoTi_P_plate2'
 #p='C:/Users/Gregoire/Documents/CaltechWork/echemdrop/20121031NiFeCoTi_P/20121101NiFeCoTi_P_plate3'
 #p='C:/Users/Gregoire/Documents/CaltechWork/echemdrop/20121031NiFeCoTi_P/20121031NiFeCoTi_P_plate2'
-p='C:/Users/Gregoire/Documents/CaltechWork/echemdrop/20121031NiFeCoTi_P/20121031NiFeCoTi_P_plate1'
+#p='C:/Users/Gregoire/Documents/CaltechWork/echemdrop/20121031NiFeCoTi_P/20121031NiFeCoTi_P_plate1'
 
+#p='C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoLa/20130425 NiFeCoLa_plate1_5959'
+#p='C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoLa/20130426NiFeCoLa_plate2_5904'
+#p='C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoLa/20130427 NiFeCoLa_plate3_5791'
+
+#p='C:/Users/gregoire/Documents/EchemDropRawData/NiFeCeLa/20130425 NiFeCeLa_plate3_5847'
+#p='C:/Users/gregoire/Documents/EchemDropRawData/NiFeCeLa/20130424 NiFeCeLa_plate2 5825 B'
+#p='C:/Users/gregoire/Documents/EchemDropRawData/NiFeCeLa/20130423 NiFeCeLa_plate1_5836'
+
+#p='C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoCe/20130402NiFeCoCe_Plate1_5500'
+#p='C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoCe/20130403NiFeCoCe_Plate2_5498'
+p='C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoCe/20130403NiFeCoCe_Plate3_4835'
 
 fld, fn=os.path.split(p)
 savep=os.path.join(os.path.join(fld, 'results'), fn+'_dlist.dat')
@@ -32,7 +43,7 @@ form=MainMenu(None, execute=False, folderpath=p)
 
 echemvis=form.echem
 
-echemvis.expmntLineEdit.setText('CV6')
+echemvis.expmntLineEdit.setText('CV3')
 
 if 1:
     echemvis.get_techniquedictlist(nfiles=99999)
@@ -44,7 +55,7 @@ if 1:
     print '%%', len(dlist)
     
     calcmeandEdt_dlist(dlist)
-    if 0:
+    if 1:
         calcsegind_dlist(dlist, SGpts=10)
     else:
         manualsegind_dlist(dlist, istart=[0, 562])
@@ -200,41 +211,43 @@ for count, d in enumerate(dlist):
 #    minslope*=d['dt']/dx
 #    dydev_abs*=d['dt']/dx
     for segd in d['segprops_dlist'][:1]:#[2:3]:
-        y=d['I(A)'][segd['inds']]
-        istart_segs, len_segs, fitdy_segs, fitinterc_segs, dy=findlinearsegs(y, dydev_frac,  dydev_nout, dn_segstart, dydev_abs=dydev_abs,  plotbool=plotbool, dx=dx, critdy_fracmaxdy=None)
-        #print '***', istart_segs
-        if len(istart_segs)==0:
-            print 'NO SEGS FOUND',  count, 'sample',  d['Sample']
-            pylab.plot(y)
-            pylab.figure()
-            pylab.plot(dy)
-            istart_segs, len_segs, fitdy_segs, fitinterc_segs, dy=findlinearsegs(y, dydev_frac,  dydev_nout, dn_segstart, dydev_abs=dydev_abs,  plotbool=1, dx=dx, critdy_fracmaxdy=None)
-            continue
-        v0v1=numpy.array([d['Ewe(V)'][segd['inds']][i0:i0+l][[0, -1]] for i0, l in zip(istart_segs, len_segs)])
-        dE_segs=v0v1[:, 1]-v0v1[:, 0]
-        segi=numpy.where(((dE_segs)>Vsegrange1)&(fitdy_segs>minslope))[0]
-        if len(segi)>0:
-            seli=segi[numpy.argmin(fitdy_segs[segi])]
-        else:
-            segi=numpy.where(fitdy_segs>minslope)[0]
-            seli=segi[numpy.argmin(fitdy_segs[segi])]
-            print 'dE', dE_segs[seli],  'sample',  d['Sample']
-        dysel=fitdy_segs[seli]
-        intsel=fitinterc_segs[seli]
-        #print dysel, intsel
-        #for i0, l, dy, interc in zip(istart_segs, len_segs, fitdy_segs, fitinterc_segs):
-        ylin=intsel+dysel*numpy.arange(len(y))*dx
-#        pylab.figure()
-#        pylab.plot(y)
-#        pylab.plot(ylin)
-#        pylab.plot(y-ylin)
-        d['SegIndStart_LinSub']=istart_segs[seli]
-        d['LinLen_LinSub']=len_segs[seli]
-        d['Intercept_LinSub']=intsel
-        d['dIdt_LinSub']=dysel
-        d['I(A)_LinSub']=numpy.zeros(d['I(A)'].shape, dtype='float32')
-        d['I(A)_LinSub'][segd['inds']]=numpy.float32(y-ylin)
-        
+        try:
+            y=d['I(A)'][segd['inds']]
+            istart_segs, len_segs, fitdy_segs, fitinterc_segs, dy=findlinearsegs(y, dydev_frac,  dydev_nout, dn_segstart, dydev_abs=dydev_abs,  plotbool=plotbool, dx=dx, critdy_fracmaxdy=None)
+            #print '***', istart_segs
+            if len(istart_segs)==0:
+                print 'NO SEGS FOUND',  count, 'sample',  d['Sample']
+                pylab.plot(y)
+                pylab.figure()
+                pylab.plot(dy)
+                istart_segs, len_segs, fitdy_segs, fitinterc_segs, dy=findlinearsegs(y, dydev_frac,  dydev_nout, dn_segstart, dydev_abs=dydev_abs,  plotbool=1, dx=dx, critdy_fracmaxdy=None)
+                continue
+            v0v1=numpy.array([d['Ewe(V)'][segd['inds']][i0:i0+l][[0, -1]] for i0, l in zip(istart_segs, len_segs)])
+            dE_segs=v0v1[:, 1]-v0v1[:, 0]
+            segi=numpy.where(((dE_segs)>Vsegrange1)&(fitdy_segs>minslope))[0]
+            if len(segi)>0:
+                seli=segi[numpy.argmin(fitdy_segs[segi])]
+            else:
+                segi=numpy.where(fitdy_segs>minslope)[0]
+                seli=segi[numpy.argmin(fitdy_segs[segi])]
+                print 'dE', dE_segs[seli],  'sample',  d['Sample']
+            dysel=fitdy_segs[seli]
+            intsel=fitinterc_segs[seli]
+            #print dysel, intsel
+            #for i0, l, dy, interc in zip(istart_segs, len_segs, fitdy_segs, fitinterc_segs):
+            ylin=intsel+dysel*numpy.arange(len(y))*dx
+    #        pylab.figure()
+    #        pylab.plot(y)
+    #        pylab.plot(ylin)
+    #        pylab.plot(y-ylin)
+            d['SegIndStart_LinSub']=istart_segs[seli]
+            d['LinLen_LinSub']=len_segs[seli]
+            d['Intercept_LinSub']=intsel
+            d['dIdt_LinSub']=dysel
+            d['I(A)_LinSub']=numpy.zeros(d['I(A)'].shape, dtype='float32')
+            d['I(A)_LinSub'][segd['inds']]=numpy.float32(y-ylin)
+        except:
+            print 'problem,  skipping Sample ', d['Sample']
 
 dIdEcrit=.0005
 SegdtSG_dlist(dlist, SGpts=10, order=1, k='I(A)_LinSub', dxk='dE')

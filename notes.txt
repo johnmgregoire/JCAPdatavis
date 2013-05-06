@@ -1,0 +1,6 @@
+for CVs:
+
+create "results" folder
+run echem_plate_test3 to parse to dlist .pck and perform linear subtraction
+run cvprocess_temp_pickledlist for FOM calculation and plotting (create "plate#/LinSubPlots" folders)
+run echem_stacked_tern4 for plotting

@@ -18,6 +18,8 @@ import pickle
 from echem_plate_math import *
 from echem_plate_fcns import *
 
+PyCodePath=os.path.split(os.path.split(os.path.realpath(__file__))[0])[0]
+
 from matplotlib.ticker import FuncFormatter
 from matplotlib.ticker import ScalarFormatter
 def myexpformat_4digs(x, pos):
@@ -59,25 +61,20 @@ def autocolorbarformat(lims, ndec=3):
 
 wd=os.getcwd()
 
-#os.chdir('C:/Users/Public/Documents/PythonCode/ternaryplot')
-sys.path.append('C:/Users/Public/Documents/PythonCode/ternaryplot')
 
+sys.path.append(os.path.join(PyCodePath,'ternaryplot'))
 from myternaryutility import TernaryPlot
 from myquaternaryutility import QuaternaryPlot
 from quaternary_FOM_stackedtern2 import *
 from quaternary_FOM_stackedtern30 import *
 
-sys.path.append('C:/Users/Public/Documents/PythonCode/dbcomm')
-#os.chdir('C:/Users/Public/Documents/PythonCode/dbcomm')
+sys.path.append(os.path.join(PyCodePath,'dbcomm'))
 from mysql_dbcommlib import *
 
-os.chdir('C:/Users/Public/Documents/EchemDropAnalyzedData')
-
-#os.chdir('C:/Users/Gregoire/Documents/CaltechWork/echemdrop/20130301_CuZnSnFe_Plate3_3654')
-#os.chdir('C:/Users/Gregoire/Documents/CaltechWork/echemdrop/20120728NiFeCoTiplate1_test21Aug2012')
-#os.chdir('C:/Users/Gregoire/Documents/CaltechWork/echemdrop/FeMoNiTiplate1_test1617Aug2012')
-#os.chdir('C:/Users/Gregoire/Documents/PythonCode/JCAP/EchemVisualization/20120705testplate01')
-#os.chdir('C:/Users/jcap/Desktop/20120705testplate01')
+sys.path.append(os.path.join(PyCodePath, 'PythonCodeSecureFiles'))
+from paths import *
+if os.path.isdir(EchemSavePath):
+    os.chdir(EchemSavePath)
 
 
     
@@ -262,7 +259,10 @@ class MainMenu(QMainWindow):
         if execute:
             self.echem.exec_()
         if self.echem.dbdatasource:
-            self.echem.dbc.db.close()
+            try:
+                self.echem.dbc.db.close()
+            except:
+                pass
 
 class echem10axesWidget(QDialog):
     def __init__(self, parent=None, ellabels=['A', 'B', 'C', 'D']):
@@ -329,7 +329,7 @@ class echemvisDialog(QDialog):
 #        self.echem30.show()
         self.plotillumkey=None
         if folderpath is None:
-            self.dbdatasource=userinputDialog(self, inputs=[('DBsource?', bool, '1')], title='Change to 0 to read for local harddrive.')
+            self.dbdatasource=userinputcaller(self, inputs=[('DBsource?', bool, '1')], title='Change to 0 to read for local harddrive.')[0]
             if self.dbdatasource:
                 self.dbc=None#self.createdbsession()
                 
@@ -654,12 +654,12 @@ class echemvisDialog(QDialog):
         self.resize(1600, 750)
     
     def createdbsession(self):        
-        ans=userinputcaller(self, inputs=[('user:', str, 'mmarcin'), ('password:', str, '')], title='Enter database credentials', cancelallowed=True)
+        ans=userinputcaller(self, inputs=[('user:', str, ''), ('password:', str, '')], title='Enter database credentials', cancelallowed=True)
         if ans is None:
             return
         self.dbc=dbcomm(user=ans[0].strip(), password=ans[1].strip(),db='hte_echemdrop_proto')
         
-    def selectfolder(self, plate_id=None, selectexids=None):
+    def selectfolder(self, plate_id=None, selectexids=None, folder=None):
         self.statusLineEdit.setText('waiting for folder input')
         if self.dbdatasource:
             if not self.dbc is None:
@@ -689,7 +689,10 @@ class echemvisDialog(QDialog):
             for k, v in self.dbrecarrd.iteritems():
                 self.dbrecarrd[k]=v[inds]
         else:
-            self.folderpath=mygetdir(self, markstr='containing echem data .txt for single plate')
+            if folder is None:
+                self.folderpath=mygetdir(self, markstr='containing echem data .txt for single plate')
+            else:
+                self.folderpath=folder
         self.statusLineEdit.setText('idle')
         #self.calcandplot()
         
