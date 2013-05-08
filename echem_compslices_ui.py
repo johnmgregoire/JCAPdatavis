@@ -291,27 +291,16 @@ class echem30axesWidget(QDialog):
         self.plotw.fig.canvas.draw()
         
 class quatsliceDialog(QDialog):
-    def __init__(self, parent, echem30_select, echem30_all, title='', folderpath=None, comps=None, fom=None, smp=None, ellabels=['A', 'B', 'C', 'D']):
+    def __init__(self, parent, echem30_select, echem30_all, title='', folderpath=None, ellabels=['A', 'B', 'C', 'D']):
         super(quatsliceDialog, self).__init__(parent)
         self.parent=parent
         
         self.echem30_select=echem30_select
         self.echem30_all=echem30_all
         
-        self.comps=comps
-        self.fom=fom
-        self.smp=smp
         self.ellabels=ellabels
-        self.techniquedictlist=[]
-        
-#        self.plotw_30select=plotwidget(self)
-#        self.plotw_30select.fig.clf()
-#        self.axl_30select, self.stpl_30select=make30ternaxes(fig=self.plotw_30select.fig, ellabels=ellabels)
-#        
-#        self.plotw_30all=plotwidget(self)
-#        self.plotw_30all.fig.clf()
-#        self.axl_30all, self.stpl_30all=make30ternaxes(fig=self.plotw_30all.fig, ellabels=ellabels)
-        
+        self.dataclass=fomdatapreset()
+
         self.plotw_quat=plotwidget(self, projection3d=True)
         
         self.plotw_tern=plotwidget(self)
@@ -343,8 +332,15 @@ class quatsliceDialog(QDialog):
         self.compcutComboBox=QComboBox()
         for i, nam in enumerate(['1-D (pseudobinary)', '2-D (pseudoternnary)']):
             self.compcutComboBox.insertItem(i, nam)
-            
         self.compcutComboBox.setCurrentIndex(0)
+        
+        self.systemsComboBox=QComboBox()
+        self.systemsinds=[]
+        for i, (ind, nam) in enumerate(self.dataclass.systemoptions):
+            self.systemsComboBox.insertItem(i, nam)
+            self.systemsinds+=[ind]
+
+        self.systemsComboBox.setCurrentIndex(0)
         
         sl=['0.', '0.', '1.', '0.', '0.', '0.']
         self.complineeditlist=[]
@@ -363,7 +359,7 @@ class quatsliceDialog(QDialog):
         QObject.connect(plotButton, SIGNAL("pressed()"), self.calcandplot)
         
         saveButton=QPushButton()
-        saveButton.setText("update\nfigures")
+        saveButton.setText("Save figs\n+ Samples")
         QObject.connect(saveButton, SIGNAL("pressed()"), self.save)
         
         templab=QLabel()
@@ -385,13 +381,20 @@ class quatsliceDialog(QDialog):
         
         templab=QLabel()
         templab.setText('min,max colorbar')
-        
         self.vminmaxLineEdit=QLineEdit()
-        
         vminmaxlayout=QVBoxLayout()
         vminmaxlayout.addWidget(templab)
         vminmaxlayout.addWidget(self.vminmaxLineEdit)
 
+
+        templab=QLabel()
+        templab.setText('azim,elev tetr.')
+        self.azimelevLineEdit=QLineEdit()
+        azimelevlayout=QVBoxLayout()
+        azimelevlayout.addWidget(templab)
+        azimelevlayout.addWidget(self.azimelevLineEdit)
+        self.azimelevLineEdit.setText('-159,30')
+        
         templab=QLabel()
         templab.setText('below,above range colors:\nEnter a char,0-1 gray,tuple,\n"None" for ignore')
         
@@ -431,7 +434,8 @@ class quatsliceDialog(QDialog):
         
         ctrllayout.addWidget(plotButton, 0, 0)
         ctrllayout.addWidget(self.compcutComboBox, 0, 1)
-        ctrllayout.addWidget(saveButton, 1, 2)
+        ctrllayout.addWidget(saveButton, 0, 2)
+        ctrllayout.addWidget(self.systemsComboBox, 0, 3)
         
         ctrllayout.addWidget(compLabel, 1, 0)
         ctrllayout.addWidget(self.complineeditlist[0], 1, 1)
@@ -448,8 +452,9 @@ class quatsliceDialog(QDialog):
         
         
         ctrllayout.addLayout(ternskiplayout, 4, 0)
-        ctrllayout.addLayout(fomshiftlayout, 4, 1)
-        ctrllayout.addLayout(fomscalelayout, 4, 2)
+#        ctrllayout.addLayout(fomshiftlayout, 4, 1)
+#        ctrllayout.addLayout(fomscalelayout, 4, 2)
+        ctrllayout.addLayout(azimelevlayout, 4, 1, 1, 2)
         
         mainlayout.addLayout(ctrllayout, 0, 0, 2, 1)
         mainlayout.addWidget(self.plotw_quat, 3, 0)
@@ -466,7 +471,7 @@ class quatsliceDialog(QDialog):
         for i, l in enumerate(self.ellabels):
             self.ternskipComboBox.insertItem(i, l)
         self.ternskipComboBox.setCurrentIndex(3)
-        
+        self.selectsystem=None
         self.quatcalc=QuaternaryPlot(111, ellabels=self.ellabels)
         self.resize(600, 850)
     
@@ -474,12 +479,30 @@ class quatsliceDialog(QDialog):
     def selectfolder(self, folder=None):
 
         if folder is None:
-            self.folderpath=mygetdir(self, markstr='containing fom data and for saving')
+            self.folderpath=mygetdir(self, markstr='for saving')
         else:
             self.folderpath=folder
         
     def calcandplot(self):
-
+        i=self.systemsinds[self.systemsComboBox.currentIndex()]
+        if self.selectsystem is None or i!=self.selectsystem:
+            self.selectsystem=i
+            self.dataclass.readdata(self.selectsystem)
+            
+            self.comps=self.dataclass.compsall
+            self.fom=self.dataclass.fomall
+            self.smp=self.dataclass.smpsall
+            self.ellabels=self.dataclass.ellabels
+            self.vminmaxLineEdit.setText(`self.dataclass.vmin`+','+`self.dataclass.vmax`)
+            for le, v in zip([self.belowrangecolLineEdit, self.aboverangecolLineEdit], [self.dataclass.belowrangecolstr, self.dataclass.aboverangecolstr]):
+                le.setText(`v`)
+        
+            i0=self.ternskipComboBox.currentIndex()
+            self.ternskipComboBox.clear()
+            for i, l in enumerate(self.ellabels):
+                self.ternskipComboBox.insertItem(i, l)
+            self.ternskipComboBox.setCurrentIndex(i0)
+            
         self.calctype=self.compcutComboBox.currentIndex()
         critdist=self.critdistSpinBox.value()
         
@@ -517,6 +540,19 @@ class quatsliceDialog(QDialog):
         
         fom=self.fom
     
+        azim=-159.
+        elev=30.
+        vstr=str(self.azimelevLineEdit.text()).strip()
+        if ',' in vstr:
+            a, b, c=vstr.partition(',')
+            try:
+                a=myeval(a.strip())
+                c=myeval(c.strip())
+                self.vmin=a
+                self.vmax=c
+            except:
+                pass
+                
         if self.revcmapCheckBox.isChecked():
             cmap=cm.jet_r
         else:
@@ -596,7 +632,7 @@ class quatsliceDialog(QDialog):
         
         
         
-        fomlabel=''
+        fomlabel=self.dataclass.fomlabel
         self.stackedternplotdict=dict([('comps', reordercomps), ('fom', fom), ('cmap', cmap), ('norm', norm), ('ellabels', reorderlabels), ('fomlabel', fomlabel)])
         self.stackedternplotdictselect=dict([('comps', reordercompsselect), ('fom', fomselect), ('cmap', cmap), ('norm', norm), ('ellabels', reorderlabels), ('fomlabel', fomlabel)])
         
@@ -605,36 +641,55 @@ class quatsliceDialog(QDialog):
         
         quat=QuaternaryPlot(self.plotw_quat.axes, ellabels=self.ellabels, offset=0)
         quat.label()
-        quat.scatter(compsselect, c=fomselect, s=s, cmap=cmap, vmin=self.vmin, vmax=self.vmax)
+        quat.scatter(compsselect, c=fomselect, s=s, cmap=cmap, vmin=self.vmin, vmax=self.vmax, edgecolor='none')
         cb=self.plotw_quat.fig.colorbar(quat.mappable, cax=self.cbax_quat, extend=extend, format=autocolorbarformat((fom.min(), fom.max())))
+        cb.set_label(fomlabel)
+        quat.set_projection(azim=azim, elev=elev)
         
         if self.calctype==0:
             quat.line(self.compverts[0], self.compverts[1])
             self.quatcalc.plotfomalonglineparameter(self.plotw_tern.axes, self.lineparameter, fomselect, compend1=self.compverts[0], compend2=self.compverts[1], lineparticks=numpy.linspace(0, 1, 4), ls='none', marker='.')
         elif self.calctype==1:
-            self.quatcalc.plotfominselectedplane(self.plotw_tern.axes, self.xyparr, fomselect, xyp_verts=self.xyp_verts, vertcomps_labels=[self.compverts[0], self.compverts[1], self.compverts[2]], s=20, edgecolor='none')
+            self.quatcalc.plotfominselectedplane(self.plotw_tern.axes, self.xyparr, fomselect, xyp_verts=self.xyp_verts, vertcomps_labels=[self.compverts[0], self.compverts[1], self.compverts[2]], s=20, edgecolor='none', cmap=cmap, vmin=self.vmin, vmax=self.vmax)
             quat.line(self.compverts[0], self.compverts[1])
             quat.line(self.compverts[0], self.compverts[2])
             quat.line(self.compverts[2], self.compverts[1])
 
         
         cb=self.plotw_tern.fig.colorbar(quat.mappable, cax=self.cbax_tern, extend=extend, format=autocolorbarformat((fom.min(), fom.max())))
+        cb.set_label(fomlabel)
         
         self.plotw_quat.axes.mouse_init()
         self.plotw_quat.axes.set_axis_off()
         self.plotw_tern.fig.canvas.draw()
         self.plotw_quat.fig.canvas.draw()
     def save(self):
-        pngname=lambda sn:os.path.join(self.folderpath, '_'+sn+'.png')
+        self.selectfolder(None)
+
+        lab=str(self.systemsComboBox.currentText())
+        lab+='_'+self.dataclass.expstr+'_'
         
-        for fig, saven in zip([self.plotw_quat.fig, self.plotw_tern.fig, self.echem30_select.plotw.fig, self.echem30_all.plotw.fig], []):
-            pylab.figure(fig.number)
-            pylab.savefig(pngname(saven))
+        if self.calctype==0:
+            lab+='1Dcut_'
+        elif self.calctype==0:
+            lab+='2Dcut_'
+        
+        pngname=lambda sn:os.path.join(self.folderpath, '_'+sn+'.png')
+        epsname=lambda sn:os.path.join(self.folderpath, '_'+sn+'.eps')
+    
+        for fig, saven in zip([self.plotw_quat.fig, self.plotw_tern.fig, self.echem30_select.plotw.fig, self.echem30_all.plotw.fig], ['tetr', 'projection', 'stackedselect', 'stackedall']):
+            fig.savefig(pngname(saven))
+            fig.savefig(epsname(saven))
         
         s='\n'.join([`i` for i in self.smp[self.selectinds]])
-        sp=os.path.join(self.folderpath, '_'+self.fomname+'.txt')
+        sp=os.path.join(self.folderpath, lab+'.txt')
         f=open(sp, mode='w')
-        f.write()
+        f.write(s)
+        f.close()
+        
+        
+        
+        
         
 class messageDialog(QDialog):
     def __init__(self, parent=None, title=''):
@@ -684,111 +739,201 @@ class plotwidget(FigureCanvas):
             self.clicklist+=[arrayxy]
             self.emit(SIGNAL("genericclickonplot"), [event.xdata, event.ydata, event.button])
 
-SYSTEM=1
-if SYSTEM==1:
-    ellabels=['Ni', 'Fe', 'Co', 'Ce']
-    os.chdir('C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoCe/results')
-    rootstr='_I400mVLinSub.txt'
-    expstr='I400mVLinSub'
-    fomlabel='I at 400mV vs E$_{OER}$ (mA/cm$^2$)'
-    fomshift=0.
-    fommult=100000.
-    vmin=1
-    vmax=42
-    cmap=cm.jet
-    aboverangecolstr='pink'
-    belowrangecolstr='k'
-    savefolder=os.path.join(os.getcwd(), expstr)
-    binarylegloc=1
-    elkeys=['Ni', 'Fe', 'Co', 'Ce']
 
-    
-dpl=['', '', '']
-for root, dirs, files in os.walk(os.getcwd()):
-    testfn=[fn for fn in files if (rootstr in fn) and (expstr in fn)]
-    for fn in testfn:
-        for count in range(3):
-            if ('late%d' %(count+1)) in fn:
-                dpl[count]=os.path.join(root, fn)
+class fomdatapreset():
+    def __init__(self):
+        self.systemoptions=[\
+            (1, '201304NiFeCoCeVCP10'), \
+            (2, '201304NiFeCoCeI350mV'), \
+            (3, '201304NiFeCoCeI400mV'), \
+            (4, '201304NiFeCoCeVCV3'), \
+            (5, '201304NiFeCoCeVCV10'), \
+            ]
+    def readdata(self, SYSTEM=1):
+        if SYSTEM==1:
+            ellabels=['Ni', 'Fe', 'Co', 'Ce']
+            os.chdir('C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoCe/results')
+            rootstr='201304'
+            expstr='CP1Efin'
+            fomlabel='V for 10 mA/cm$^2$ (V vs H$_2$0/O$_2$)'
+            fomshift=-.187
+            fommult=1.
+            vmin=.33
+            vmax=.43
+            cmap=cm.jet_r
+            aboverangecolstr='k'
+            belowrangecolstr='.3'
+            savefolder=os.path.join(os.getcwd(), expstr)
+            binarylegloc=1
+            elkeys=['Ni', 'Fe', 'Co', 'Ce'] 
+        elif SYSTEM==2:
+            ellabels=['Ni', 'Fe', 'Co', 'Ce']
+            os.chdir('C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoCe/results')
+            rootstr='_I350mVLinSub.txt'
+            expstr='I350mVLinSub'
+            fomlabel='I at 350mV vs E$_{OER}$ (mA/cm$^2$)'
+            fomshift=0.
+            fommult=100000.
+            vmin=1
+            vmax=10
+            cmap=cm.jet
+            aboverangecolstr='pink'
+            belowrangecolstr='k'
+            savefolder=os.path.join(os.getcwd(), expstr)
+            binarylegloc=1
+            elkeys=['Ni', 'Fe', 'Co', 'Ce']
+        elif SYSTEM==3:
+            ellabels=['Ni', 'Fe', 'Co', 'Ce']
+            os.chdir('C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoCe/results')
+            rootstr='_I400mVLinSub.txt'
+            expstr='I400mVLinSub'
+            fomlabel='I at 400mV vs E$_{OER}$ (mA/cm$^2$)'
+            fomshift=0.
+            fommult=100000.
+            vmin=1
+            vmax=42
+            cmap=cm.jet
+            aboverangecolstr='pink'
+            belowrangecolstr='k'
+            savefolder=os.path.join(os.getcwd(), expstr)
+            binarylegloc=1
+            elkeys=['Ni', 'Fe', 'Co', 'Ce']
+
+        elif SYSTEM==4:
+            ellabels=['Ni', 'Fe', 'Co', 'Ce']
+            os.chdir('C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoCe/results')
+            rootstr='_V_IthreshCVLinSub_30.txt'
+            expstr='V_IthreshCVLinSub_30'
+            fomlabel='E for 3mA/cm$^2$ (mV vs E$_{OER}$)'
+            fomshift=0.
+            fommult=1000.
+            vmin=280
+            vmax=400
+            cmap=cm.jet_r
+            aboverangecolstr='k'
+            belowrangecolstr='pink'
+            savefolder=os.path.join(os.getcwd(), expstr)
+            binarylegloc=1
+            elkeys=['Ni', 'Fe', 'Co', 'Ce']
+
+        elif SYSTEM==5:
+            ellabels=['Ni', 'Fe', 'Co', 'Ce']
+            os.chdir('C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoCe/results')
+            rootstr='_V_IthreshCVLinSub_100.txt'
+            expstr='V_IthreshCVLinSub_100'
+            fomlabel='E for 10mA/cm$^2$ (mV vs E$_{OER}$)'
+            fomshift=0.
+            fommult=1000.
+            vmin=350
+            vmax=440
+            cmap=cm.jet_r
+            aboverangecolstr='k'
+            belowrangecolstr='pink'
+            savefolder=os.path.join(os.getcwd(), expstr)
+            binarylegloc=1
+            elkeys=['Ni', 'Fe', 'Co', 'Ce']
+
+        ellabels=['A', 'B', 'C', 'D']
+        
+        
+        dpl=['', '', '']
+        for root, dirs, files in os.walk(os.getcwd()):
+            testfn=[fn for fn in files if (rootstr in fn) and (expstr in fn)]
+            for fn in testfn:
+                for count in range(3):
+                    if ('late%d' %(count+1)) in fn:
+                        dpl[count]=os.path.join(root, fn)
+                    
+        print 'FOM file paths:'
+        for dp in dpl:
+            print dp
             
-print 'FOM file paths:'
-for dp in dpl:
-    print dp
-    
-dropdl=[]
-for dp in dpl:
-    if dp=='':
-        dropdl+=[None]
-        continue
-    f=open(dp, mode='r')
-    dr=csv.DictReader(f, delimiter='\t')
-    dropd={}
-    for l in dr:
-        for kr in l.keys():
-            k=kr.strip()
-            if not k in dropd.keys():
-                dropd[k]=[]
-            dropd[k]+=[myeval(l[kr].strip())]
-    for k in dropd.keys():
-        dropd[k]=numpy.array(dropd[k])
-    f.close()
-    dropdl+=[dropd]
+        dropdl=[]
+        for dp in dpl:
+            if dp=='':
+                dropdl+=[None]
+                continue
+            f=open(dp, mode='r')
+            dr=csv.DictReader(f, delimiter='\t')
+            dropd={}
+            for l in dr:
+                for kr in l.keys():
+                    k=kr.strip()
+                    if not k in dropd.keys():
+                        dropd[k]=[]
+                    dropd[k]+=[myeval(l[kr].strip())]
+            for k in dropd.keys():
+                dropd[k]=numpy.array(dropd[k])
+            f.close()
+            dropdl+=[dropd]
 
 
-figquatall=[]
-compsall=[]
-fomall=[]
-plateindall=[]
-codeall=[]
-smpsall=[]
-for count, dropd in enumerate(dropdl):
-    if dropd is None:
-        continue
-    print dropd.keys()
-    #dropinds=numpy.arange(len(dropd['Sample']))
-    try:
-        dropd['compositions']=numpy.array([dropd[elkey] for elkey in elkeys]).T
-    except:
-        dropd['compositions']=numpy.array([dropd[elkey] for elkey in ['A', 'B', 'C', 'D']]).T
-    
-    addcodetoplatemapgen1dlist(dlist=None, dropd=dropd)
-    
-    dropinds=numpy.argsort(dropd['Sample'])
-    dropinds=dropinds[numpy.logical_not(numpy.isnan(dropd[expstr][dropinds]))]
-    x=dropd['x(mm)'][dropinds]
-    y=dropd['y(mm)'][dropinds]
-    sample=dropd['Sample'][dropinds]
-    fom=(dropd[expstr][dropinds]+fomshift)*fommult
-    
-    comp=dropd['compositions'][dropinds]
-    code=dropd['code'][dropinds]
-    
-    comp=numpy.array([a/a.sum() for a in comp])
-    smpsall+=list(sample)
-    compsall+=list(comp)
-    fomall+=list(fom)
-    plateindall+=[count]*len(fom)
-    codeall+=list(code)
+        figquatall=[]
+        compsall=[]
+        fomall=[]
+        plateindall=[]
+        codeall=[]
+        smpsall=[]
+        for count, dropd in enumerate(dropdl):
+            if dropd is None:
+                continue
+            print dropd.keys()
+            #dropinds=numpy.arange(len(dropd['Sample']))
+            try:
+                dropd['compositions']=numpy.array([dropd[elkey] for elkey in elkeys]).T
+            except:
+                dropd['compositions']=numpy.array([dropd[elkey] for elkey in ['A', 'B', 'C', 'D']]).T
+            
+            addcodetoplatemapgen1dlist(dlist=None, dropd=dropd)
+            
+            dropinds=numpy.argsort(dropd['Sample'])
+            dropinds=dropinds[numpy.logical_not(numpy.isnan(dropd[expstr][dropinds]))]
+            x=dropd['x(mm)'][dropinds]
+            y=dropd['y(mm)'][dropinds]
+            sample=dropd['Sample'][dropinds]
+            fom=(dropd[expstr][dropinds]+fomshift)*fommult
+            
+            comp=dropd['compositions'][dropinds]
+            code=dropd['code'][dropinds]
+            
+            comp=numpy.array([a/a.sum() for a in comp])
+            smpsall+=list(sample)
+            compsall+=list(comp)
+            fomall+=list(fom)
+            plateindall+=[count]*len(fom)
+            codeall+=list(code)
 
-smpsall=numpy.array(smpsall)
+        smpsall=numpy.array(smpsall)
 
-compsall=numpy.array(compsall)
-fomall=numpy.array(fomall)
-plateindall=numpy.array(plateindall)
-codeall=numpy.array(codeall)
-code0inds=numpy.where(codeall==0)
-code02inds=numpy.where(codeall!=1)
-code2inds=numpy.where(codeall==2)
+        compsall=numpy.array(compsall)
+        fomall=numpy.array(fomall)
+        plateindall=numpy.array(plateindall)
+        codeall=numpy.array(codeall)
+        code0inds=numpy.where(codeall==0)
+        code02inds=numpy.where(codeall!=1)
+        code2inds=numpy.where(codeall==2)
 
-compsall=compsall[code0inds]
-fomall=fomall[code0inds]
-smpsall=smpsall[code0inds]
+        compsall=compsall[code0inds]
+        fomall=fomall[code0inds]
+        smpsall=smpsall[code0inds]
+        
+        self.compsall=compsall
+        self.fomall=fomall
+        self.smpsall=smpsall
+        self.ellabels=ellabels
+        self.vmin=vmin
+        self.vmax=vmax
+        self.aboverangecolstr=aboverangecolstr
+        self.belowrangecolstr=belowrangecolstr
+        self.expstr=expstr
+        self.fomlabel=fomlabel
+        
 
 
 def start(previousmm=None):
     mainapp=QApplication(sys.argv)
 
-    form=MainMenu(previousmm, comps=compsall, fom=fomall, smp=smpsall, ellabels=ellabels)
+    form=MainMenu(previousmm)
     form.show()
     form.setFocus()
     global PARENT
