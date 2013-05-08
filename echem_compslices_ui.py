@@ -268,8 +268,9 @@ class echem30axesWidget(QDialog):
             self.buttonBox.setStandardButtons(QDialogButtonBox.Ok)
             QObject.connect(self.buttonBox, SIGNAL("accepted()"), self.accept)
             mainlayout.addWidget(self.buttonBox)
-        
+        QObject.connect(self.plotw, SIGNAL("genericclickonplot"), self.clickprocess)
         self.setLayout(mainlayout)
+        self.terncalc=TernaryPlot(111)
     
     def plot(self, d, cb=True):
         if 'fomlabel' in d.keys():
@@ -289,7 +290,12 @@ class echem30axesWidget(QDialog):
         self.axl, self.stpl=make30ternaxes(fig=self.plotw.fig, ellabels=self.ellabels)
         scatter_30axes(d['comps'], d['fom'], self.stpl, s=18, edgecolors='none', cb=cb, cblabel=cblabel, cmap=d['cmap'], norm=d['norm'])
         self.plotw.fig.canvas.draw()
-        
+    
+    def clickprocess(self, coords_button):
+        xc, yc, button=coords_button
+        clickcomplist=self.terncalc.toComp(numpy.array([[xc, yc]]))
+        print 'clicked ternary composition is ', clickcomplist[0]
+            
 class quatsliceDialog(QDialog):
     def __init__(self, parent, echem30_select, echem30_all, title='', folderpath=None, ellabels=['A', 'B', 'C', 'D']):
         super(quatsliceDialog, self).__init__(parent)
@@ -311,6 +317,9 @@ class quatsliceDialog(QDialog):
         
         self.plotw_tern.fig.subplots_adjust(left=0.1, right=axrect[0]-.08)
         self.cbax_tern=self.plotw_tern.fig.add_axes(axrect)
+        
+        QObject.connect(self.plotw_tern, SIGNAL("genericclickonplot"), self.ternclickprocess)
+
         
         self.plotw_quat.fig.subplots_adjust(left=0, right=axrect[0]-.08)
         self.cbax_quat=self.plotw_quat.fig.add_axes(axrect)
@@ -526,7 +535,8 @@ class quatsliceDialog(QDialog):
         elif self.calctype==1:
             self.selectinds, distfromplane, self.xyparr, self.xyp_verts,intriangle=self.quatcalc.filterbydistancefromplane(self.comps, self.compverts[0], self.compverts[1], self.compverts[2], critdist, withintriangle=betweenbool, invlogic=invertbool, returnall=True)
             self.xyparr=self.xyparr[self.selectinds]
-    
+        
+        self.selectcomps=self.comps[self.selectinds]
         self.plot()
         
 
@@ -633,15 +643,15 @@ class quatsliceDialog(QDialog):
         
         
         fomlabel=self.dataclass.fomlabel
-        self.stackedternplotdict=dict([('comps', reordercomps), ('fom', fom), ('cmap', cmap), ('norm', norm), ('ellabels', reorderlabels), ('fomlabel', fomlabel)])
-        self.stackedternplotdictselect=dict([('comps', reordercompsselect), ('fom', fomselect), ('cmap', cmap), ('norm', norm), ('ellabels', reorderlabels), ('fomlabel', fomlabel)])
+        self.stackedternplotdict=dict([('comps', reordercomps), ('fom', fom), ('cmap', cmap), ('norm', norm), ('ellabels', reorderlabels), ('fomlabel', fomlabel), ('extend', extend)])
+        self.stackedternplotdictselect=dict([('comps', reordercompsselect), ('fom', fomselect), ('cmap', cmap), ('norm', norm), ('ellabels', reorderlabels), ('fomlabel', fomlabel), ('extend', extend)])
         
         self.echem30_select.clearandplot(self.stackedternplotdictselect, cb=True, ellabels=reorderlabels)
         self.echem30_all.clearandplot(self.stackedternplotdict, cb=True, ellabels=reorderlabels)
         
         quat=QuaternaryPlot(self.plotw_quat.axes, ellabels=self.ellabels, offset=0)
         quat.label()
-        quat.scatter(compsselect, c=fomselect, s=s, cmap=cmap, vmin=self.vmin, vmax=self.vmax, edgecolor='none')
+        quat.scatter(compsselect, c=fomselect, s=s, cmap=cmap, norm=norm,  edgecolor='none')#vmin=self.vmin, vmax=self.vmax,
         cb=self.plotw_quat.fig.colorbar(quat.mappable, cax=self.cbax_quat, extend=extend, format=autocolorbarformat((fom.min(), fom.max())))
         cb.set_label(fomlabel)
         quat.set_projection(azim=azim, elev=elev)
@@ -650,7 +660,7 @@ class quatsliceDialog(QDialog):
             quat.line(self.compverts[0], self.compverts[1])
             self.quatcalc.plotfomalonglineparameter(self.plotw_tern.axes, self.lineparameter, fomselect, compend1=self.compverts[0], compend2=self.compverts[1], lineparticks=numpy.linspace(0, 1, 4), ls='none', marker='.')
         elif self.calctype==1:
-            self.quatcalc.plotfominselectedplane(self.plotw_tern.axes, self.xyparr, fomselect, xyp_verts=self.xyp_verts, vertcomps_labels=[self.compverts[0], self.compverts[1], self.compverts[2]], s=20, edgecolor='none', cmap=cmap, vmin=self.vmin, vmax=self.vmax)
+            self.quatcalc.plotfominselectedplane(self.plotw_tern.axes, self.xyparr, fomselect, xyp_verts=self.xyp_verts, vertcomps_labels=[self.compverts[0], self.compverts[1], self.compverts[2]], s=20, edgecolor='none', cmap=cmap, norm=norm)
             quat.line(self.compverts[0], self.compverts[1])
             quat.line(self.compverts[0], self.compverts[2])
             quat.line(self.compverts[2], self.compverts[1])
@@ -663,6 +673,20 @@ class quatsliceDialog(QDialog):
         self.plotw_quat.axes.set_axis_off()
         self.plotw_tern.fig.canvas.draw()
         self.plotw_quat.fig.canvas.draw()
+        
+    def ternclickprocess(self, coords_button):
+        xc, yc, button=coords_button
+        if self.calctype==0:
+            clickindsel=numpy.argmin((self.lineparameter-xc)**2)
+        elif self.calctype==1:
+            clickindsel=numpy.argmin([(x-xc)**2+(y-yc)**2 for x, y in self.xyparr])
+        
+        cmp=self.selectcomps[clickindsel]
+        
+        clickind=numpy.argmin([((cmp-c)**2).sum() for c in self.comps])
+        s=self.smp[clickind]
+        print 'clicked composition is ', cmp,  '  sample is ', s
+        
     def save(self):
         self.selectfolder(None)
 
@@ -671,11 +695,11 @@ class quatsliceDialog(QDialog):
         
         if self.calctype==0:
             lab+='1Dcut_'
-        elif self.calctype==0:
+        elif self.calctype==1:
             lab+='2Dcut_'
         
-        pngname=lambda sn:os.path.join(self.folderpath, '_'+sn+'.png')
-        epsname=lambda sn:os.path.join(self.folderpath, '_'+sn+'.eps')
+        pngname=lambda sn:os.path.join(self.folderpath, lab+'_'+sn+'.png')
+        epsname=lambda sn:os.path.join(self.folderpath, lab+'_'+sn+'.eps')
     
         for fig, saven in zip([self.plotw_quat.fig, self.plotw_tern.fig, self.echem30_select.plotw.fig, self.echem30_all.plotw.fig], ['tetr', 'projection', 'stackedselect', 'stackedall']):
             fig.savefig(pngname(saven))
@@ -833,7 +857,7 @@ class fomdatapreset():
             binarylegloc=1
             elkeys=['Ni', 'Fe', 'Co', 'Ce']
 
-        ellabels=['A', 'B', 'C', 'D']
+        #ellabels=['A', 'B', 'C', 'D']
         
         
         dpl=['', '', '']
