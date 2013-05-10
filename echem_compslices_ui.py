@@ -344,9 +344,11 @@ class quatsliceDialog(QDialog):
         self.compcutComboBox.setCurrentIndex(0)
         
         self.systemsComboBox=QComboBox()
-        self.systemsinds=[]
-        for i, (ind, nam) in enumerate(self.dataclass.systemoptions):
-            self.systemsComboBox.insertItem(i, nam)
+        self.systemsinds=[-1, 0]
+        self.systemsComboBox.insertItem(999, 'select files')
+        self.systemsComboBox.insertItem(999, 'update style')
+        for ind, nam in self.dataclass.systemoptions:
+            self.systemsComboBox.insertItem(999, nam)
             self.systemsinds+=[ind]
 
         self.systemsComboBox.setCurrentIndex(0)
@@ -493,10 +495,11 @@ class quatsliceDialog(QDialog):
             self.folderpath=folder
         
     def calcandplot(self):
+        print '0'
         i=self.systemsinds[self.systemsComboBox.currentIndex()]
-        if self.selectsystem is None or i!=self.selectsystem:
+        if self.selectsystem!=0 and (self.selectsystem is None or i!=self.selectsystem or self.selectsystem==-1):
             self.selectsystem=i
-            self.dataclass.readdata(self.selectsystem)
+            self.dataclass.readdata(self.selectsystem, qparent=self)
             
             self.comps=self.dataclass.compsall
             self.fom=self.dataclass.fomall
@@ -515,7 +518,7 @@ class quatsliceDialog(QDialog):
         self.calctype=self.compcutComboBox.currentIndex()
         critdist=self.critdistSpinBox.value()
         
-        
+        print '1'
         self.compverts=[]
         for i in range(2+self.calctype):
             sl=str(self.complineeditlist[i].text()).split(',')
@@ -542,17 +545,16 @@ class quatsliceDialog(QDialog):
 
     def plot(self):
         s=25
-        
         self.plotw_tern.axes.cla()
         self.plotw_quat.axes.cla()
         self.cbax_quat.cla()
         self.cbax_tern.cla()
-        
         fom=self.fom
     
         azim=-159.
         elev=30.
         vstr=str(self.azimelevLineEdit.text()).strip()
+
         if ',' in vstr:
             a, b, c=vstr.partition(',')
             try:
@@ -562,12 +564,11 @@ class quatsliceDialog(QDialog):
                 self.vmax=c
             except:
                 pass
-                
         if self.revcmapCheckBox.isChecked():
             cmap=cm.jet_r
         else:
             cmap=cm.jet
-        
+
         clip=True
         skipoutofrange=[False, False]
         self.vmin=fom.min()
@@ -598,7 +599,7 @@ class quatsliceDialog(QDialog):
                 
             except:
                 pass
-        
+        print '4'
         norm=colors.Normalize(vmin=self.vmin, vmax=self.vmax, clip=clip)
         print 'fom min, max, mean, std:', fom.min(), fom.max(), fom.mean(), fom.std()
         
@@ -644,35 +645,38 @@ class quatsliceDialog(QDialog):
         
         fomlabel=self.dataclass.fomlabel
         self.stackedternplotdict=dict([('comps', reordercomps), ('fom', fom), ('cmap', cmap), ('norm', norm), ('ellabels', reorderlabels), ('fomlabel', fomlabel), ('extend', extend)])
-        self.stackedternplotdictselect=dict([('comps', reordercompsselect), ('fom', fomselect), ('cmap', cmap), ('norm', norm), ('ellabels', reorderlabels), ('fomlabel', fomlabel), ('extend', extend)])
-        
-        self.echem30_select.clearandplot(self.stackedternplotdictselect, cb=True, ellabels=reorderlabels)
         self.echem30_all.clearandplot(self.stackedternplotdict, cb=True, ellabels=reorderlabels)
-        
-        quat=QuaternaryPlot(self.plotw_quat.axes, ellabels=self.ellabels, offset=0)
-        quat.label()
-        quat.scatter(compsselect, c=fomselect, s=s, cmap=cmap, norm=norm,  edgecolor='none')#vmin=self.vmin, vmax=self.vmax,
-        cb=self.plotw_quat.fig.colorbar(quat.mappable, cax=self.cbax_quat, extend=extend, format=autocolorbarformat((fom.min(), fom.max())))
-        cb.set_label(fomlabel)
-        quat.set_projection(azim=azim, elev=elev)
-        
-        if self.calctype==0:
-            quat.line(self.compverts[0], self.compverts[1])
-            self.quatcalc.plotfomalonglineparameter(self.plotw_tern.axes, self.lineparameter, fomselect, compend1=self.compverts[0], compend2=self.compverts[1], lineparticks=numpy.linspace(0, 1, 4), ls='none', marker='.')
-        elif self.calctype==1:
-            self.quatcalc.plotfominselectedplane(self.plotw_tern.axes, self.xyparr, fomselect, xyp_verts=self.xyp_verts, vertcomps_labels=[self.compverts[0], self.compverts[1], self.compverts[2]], s=20, edgecolor='none', cmap=cmap, norm=norm)
-            quat.line(self.compverts[0], self.compverts[1])
-            quat.line(self.compverts[0], self.compverts[2])
-            quat.line(self.compverts[2], self.compverts[1])
 
-        
-        cb=self.plotw_tern.fig.colorbar(quat.mappable, cax=self.cbax_tern, extend=extend, format=autocolorbarformat((fom.min(), fom.max())))
-        cb.set_label(fomlabel)
-        
+        if len(fomselect)>0:
+            self.stackedternplotdictselect=dict([('comps', reordercompsselect), ('fom', fomselect), ('cmap', cmap), ('norm', norm), ('ellabels', reorderlabels), ('fomlabel', fomlabel), ('extend', extend)])
+            self.echem30_select.clearandplot(self.stackedternplotdictselect, cb=True, ellabels=reorderlabels)
+            
+            
+            quat=QuaternaryPlot(self.plotw_quat.axes, ellabels=self.ellabels, offset=0)
+            quat.label()
+            quat.scatter(compsselect, c=fomselect, s=s, cmap=cmap, norm=norm,  edgecolor='none')#vmin=self.vmin, vmax=self.vmax,
+            cb=self.plotw_quat.fig.colorbar(quat.mappable, cax=self.cbax_quat, extend=extend, format=autocolorbarformat((fom.min(), fom.max())))
+            cb.set_label(fomlabel)
+            quat.set_projection(azim=azim, elev=elev)
+            
+            if self.calctype==0:
+                quat.line(self.compverts[0], self.compverts[1])
+                self.quatcalc.plotfomalonglineparameter(self.plotw_tern.axes, self.lineparameter, fomselect, compend1=self.compverts[0], compend2=self.compverts[1], lineparticks=numpy.linspace(0, 1, 4), ls='none', marker='.')
+            elif self.calctype==1:
+                self.quatcalc.plotfominselectedplane(self.plotw_tern.axes, self.xyparr, fomselect, xyp_verts=self.xyp_verts, vertcomps_labels=[self.compverts[0], self.compverts[1], self.compverts[2]], s=20, edgecolor='none', cmap=cmap, norm=norm)
+                quat.line(self.compverts[0], self.compverts[1])
+                quat.line(self.compverts[0], self.compverts[2])
+                quat.line(self.compverts[2], self.compverts[1])
+
+            
+            cb=self.plotw_tern.fig.colorbar(quat.mappable, cax=self.cbax_tern, extend=extend, format=autocolorbarformat((fom.min(), fom.max())))
+            cb.set_label(fomlabel)
+
         self.plotw_quat.axes.mouse_init()
         self.plotw_quat.axes.set_axis_off()
         self.plotw_tern.fig.canvas.draw()
         self.plotw_quat.fig.canvas.draw()
+
         
     def ternclickprocess(self, coords_button):
         xc, yc, button=coords_button
@@ -773,7 +777,8 @@ class fomdatapreset():
             (4, '201304NiFeCoCeVCV3'), \
             (5, '201304NiFeCoCeVCV10'), \
             ]
-    def readdata(self, SYSTEM=1):
+    def readdata(self, SYSTEM=1, qparent=None):
+        selectfilesbool=False
         if SYSTEM==1:
             ellabels=['Ni', 'Fe', 'Co', 'Ce']
             os.chdir('C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoCe/results')
@@ -856,17 +861,34 @@ class fomdatapreset():
             savefolder=os.path.join(os.getcwd(), expstr)
             binarylegloc=1
             elkeys=['Ni', 'Fe', 'Co', 'Ce']
-
+        
+        else:
+            dpl=mygetopenfiles(parent=qparent, markstr='FOM .txt files', filename='.txt')
+            f=open(dpl[0], mode='r')
+            l=f.readline()
+            f.close()
+            ks=l.split('\t')
+            ks=[k.strip() for k in ks]
+            
+            elkeys=ks[3:7]
+            expstr=ks[7]
+            ellabels=elkeys
+            
+            fomshift=0.
+            fommult=1.
+            selectfilesbool=True
+        
+        
         #ellabels=['A', 'B', 'C', 'D']
         
-        
-        dpl=['', '', '']
-        for root, dirs, files in os.walk(os.getcwd()):
-            testfn=[fn for fn in files if (rootstr in fn) and (expstr in fn)]
-            for fn in testfn:
-                for count in range(3):
-                    if ('late%d' %(count+1)) in fn:
-                        dpl[count]=os.path.join(root, fn)
+        if not selectfilesbool:
+            dpl=['', '', '']
+            for root, dirs, files in os.walk(os.getcwd()):
+                testfn=[fn for fn in files if (rootstr in fn) and (expstr in fn)]
+                for fn in testfn:
+                    for count in range(3):
+                        if ('late%d' %(count+1)) in fn:
+                            dpl[count]=os.path.join(root, fn)
                     
         print 'FOM file paths:'
         for dp in dpl:
@@ -945,12 +967,19 @@ class fomdatapreset():
         self.fomall=fomall
         self.smpsall=smpsall
         self.ellabels=ellabels
-        self.vmin=vmin
-        self.vmax=vmax
-        self.aboverangecolstr=aboverangecolstr
-        self.belowrangecolstr=belowrangecolstr
         self.expstr=expstr
-        self.fomlabel=fomlabel
+        if selectfilesbool:
+            self.vmin=fomall.min()
+            self.vmax=fomall.max()
+            self.aboverangecolstr='pink'
+            self.belowrangecolstr='k'
+            self.fomlabel=expstr
+        else:
+            self.vmin=vmin
+            self.vmax=vmax
+            self.aboverangecolstr=aboverangecolstr
+            self.belowrangecolstr=belowrangecolstr
+            self.fomlabel=fomlabel
         
 
 
