@@ -312,7 +312,7 @@ class quatsliceDialog(QDialog):
         self.plotw_tern=plotwidget(self)
 
         
-        axrect=[0.92, 0.1, 0.04, 0.8]
+        axrect=[0.85, 0.1, 0.04, 0.8]
 
         
         self.plotw_tern.fig.subplots_adjust(left=0.1, right=axrect[0]-.08)
@@ -504,6 +504,10 @@ class quatsliceDialog(QDialog):
             self.comps=self.dataclass.compsall
             self.fom=self.dataclass.fomall
             self.smp=self.dataclass.smpsall
+            self.code=self.dataclass.codeall
+#            self.codeorig=self.dataclass.codeorig
+#            self.smpsorig=self.dataclass.smpsorig
+
             self.ellabels=self.dataclass.ellabels
             self.vminmaxLineEdit.setText(`self.dataclass.vmin`+','+`self.dataclass.vmax`)
             for le, v in zip([self.belowrangecolLineEdit, self.aboverangecolLineEdit], [self.dataclass.belowrangecolstr, self.dataclass.aboverangecolstr]):
@@ -604,19 +608,19 @@ class quatsliceDialog(QDialog):
         print 'fom min, max, mean, std:', fom.min(), fom.max(), fom.mean(), fom.std()
         
         comps=self.comps
-        
-        print 'skipoutofrange', skipoutofrange
-        print len(fom)
-        if skipoutofrange[0]:
-            inds=numpy.where(fom>=self.vmin)
-            fom=fom[inds]
-            comps=comps[inds]
-        print len(fom)
-        if skipoutofrange[1]:
-            inds=numpy.where(fom<=self.vmax)
-            fom=fom[inds]
-            comps=comps[inds]
-        print len(fom)
+        #comment out this skipoutofrange becuase it could mess up the indexing
+#        print 'skipoutofrange', skipoutofrange
+#        print len(fom)
+#        if skipoutofrange[0]:
+#            inds=numpy.where(fom>=self.vmin)
+#            fom=fom[inds]
+#            comps=comps[inds]
+#        print len(fom)
+#        if skipoutofrange[1]:
+#            inds=numpy.where(fom<=self.vmax)
+#            fom=fom[inds]
+#            comps=comps[inds]
+#        print len(fom)
         
         
         if numpy.any(fom>self.vmax):
@@ -646,8 +650,11 @@ class quatsliceDialog(QDialog):
         fomlabel=self.dataclass.fomlabel
         self.stackedternplotdict=dict([('comps', reordercomps), ('fom', fom), ('cmap', cmap), ('norm', norm), ('ellabels', reorderlabels), ('fomlabel', fomlabel), ('extend', extend)])
         self.echem30_all.clearandplot(self.stackedternplotdict, cb=True, ellabels=reorderlabels)
-
+        
+        print len(fomselect), ' samples selected'
+        
         if len(fomselect)>0:
+            
             self.stackedternplotdictselect=dict([('comps', reordercompsselect), ('fom', fomselect), ('cmap', cmap), ('norm', norm), ('ellabels', reorderlabels), ('fomlabel', fomlabel), ('extend', extend)])
             self.echem30_select.clearandplot(self.stackedternplotdictselect, cb=True, ellabels=reorderlabels)
             
@@ -656,7 +663,7 @@ class quatsliceDialog(QDialog):
             quat.label()
             quat.scatter(compsselect, c=fomselect, s=s, cmap=cmap, norm=norm,  edgecolor='none')#vmin=self.vmin, vmax=self.vmax,
             cb=self.plotw_quat.fig.colorbar(quat.mappable, cax=self.cbax_quat, extend=extend, format=autocolorbarformat((fom.min(), fom.max())))
-            cb.set_label(fomlabel)
+            cb.set_label(fomlabel, fontsize=18)
             quat.set_projection(azim=azim, elev=elev)
             
             if self.calctype==0:
@@ -670,7 +677,7 @@ class quatsliceDialog(QDialog):
 
             
             cb=self.plotw_tern.fig.colorbar(quat.mappable, cax=self.cbax_tern, extend=extend, format=autocolorbarformat((fom.min(), fom.max())))
-            cb.set_label(fomlabel)
+            cb.set_label(fomlabel, fontsize=18)
 
         self.plotw_quat.axes.mouse_init()
         self.plotw_quat.axes.set_axis_off()
@@ -710,10 +717,12 @@ class quatsliceDialog(QDialog):
             fig.savefig(epsname(saven))
         
         s='\n'.join([`i` for i in self.smp[self.selectinds]])
+        
         sp=os.path.join(self.folderpath, lab+'.txt')
         f=open(sp, mode='w')
         f.write(s)
         f.close()
+
         
         
         
@@ -781,7 +790,7 @@ class fomdatapreset():
         selectfilesbool=False
         if SYSTEM==1:
             ellabels=['Ni', 'Fe', 'Co', 'Ce']
-            os.chdir('C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoCe/results')
+            os.chdir('C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/results')
             rootstr='201304'
             expstr='CP1Efin'
             fomlabel='V for 10 mA/cm$^2$ (V vs H$_2$0/O$_2$)'
@@ -797,7 +806,7 @@ class fomdatapreset():
             elkeys=['Ni', 'Fe', 'Co', 'Ce'] 
         elif SYSTEM==2:
             ellabels=['Ni', 'Fe', 'Co', 'Ce']
-            os.chdir('C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoCe/results')
+            os.chdir('C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/results')
             rootstr='_I350mVLinSub.txt'
             expstr='I350mVLinSub'
             fomlabel='I at 350mV vs E$_{OER}$ (mA/cm$^2$)'
@@ -813,7 +822,7 @@ class fomdatapreset():
             elkeys=['Ni', 'Fe', 'Co', 'Ce']
         elif SYSTEM==3:
             ellabels=['Ni', 'Fe', 'Co', 'Ce']
-            os.chdir('C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoCe/results')
+            os.chdir('C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/results')
             rootstr='_I400mVLinSub.txt'
             expstr='I400mVLinSub'
             fomlabel='I at 400mV vs E$_{OER}$ (mA/cm$^2$)'
@@ -830,7 +839,7 @@ class fomdatapreset():
 
         elif SYSTEM==4:
             ellabels=['Ni', 'Fe', 'Co', 'Ce']
-            os.chdir('C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoCe/results')
+            os.chdir('C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/results')
             rootstr='_V_IthreshCVLinSub_30.txt'
             expstr='V_IthreshCVLinSub_30'
             fomlabel='E for 3mA/cm$^2$ (mV vs E$_{OER}$)'
@@ -847,7 +856,7 @@ class fomdatapreset():
 
         elif SYSTEM==5:
             ellabels=['Ni', 'Fe', 'Co', 'Ce']
-            os.chdir('C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoCe/results')
+            os.chdir('C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/results')
             rootstr='_V_IthreshCVLinSub_100.txt'
             expstr='V_IthreshCVLinSub_100'
             fomlabel='E for 10mA/cm$^2$ (mV vs E$_{OER}$)'
@@ -955,6 +964,12 @@ class fomdatapreset():
         fomall=numpy.array(fomall)
         plateindall=numpy.array(plateindall)
         codeall=numpy.array(codeall)
+        
+
+        
+        self.smpsorig=smpsall
+        self.codeorig=codeall
+        #these codes are not accurate - they are "made up" from addcodetoplatemapgen1dlist
         code0inds=numpy.where(codeall==0)
         code02inds=numpy.where(codeall!=1)
         code2inds=numpy.where(codeall==2)
@@ -962,10 +977,12 @@ class fomdatapreset():
         compsall=compsall[code0inds]
         fomall=fomall[code0inds]
         smpsall=smpsall[code0inds]
+        codeall=codeall[code0inds]
         
         self.compsall=compsall
         self.fomall=fomall
         self.smpsall=smpsall
+        self.codeall=codeall
         self.ellabels=ellabels
         self.expstr=expstr
         if selectfilesbool:
