@@ -64,8 +64,9 @@ os.chdir('C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/20130604NiFeCoCe/r
 savefolder='C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/20130604NiFeCoCe/results'
 p='C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/20130604NiFeCoCe/results/20130604NiFeCoCe_plate1_CV_6220_dlist.dat';vshift=-(.187-.043)
 
-
-#vshift=0.#-.177#-.24
+critsegVrange=.04
+critsegIend=3.e-5
+critsegVend=0.36
 
 f=open(p, mode='r')
 dlist=pickle.load(f)
@@ -91,6 +92,22 @@ dydev_abs=0.
 plotbool=0
 
 SegSG_dlist(dlist, SGpts=SGpts, order=1, k='I(A)_LinSub')
+
+#for selecting a particular sample
+#smpall=numpy.array([d['Sample'] for d in dlist])
+#i=numpy.where(smpall==18)[0]
+#dlist=[dlist[i]]
+
+
+#delete previous tael calculations
+for d in dlist:
+    segd=d['segprops_dlist'][0]
+    for k in segd.keys():
+        if k.startswith('Tafel'):
+            del segd[k]
+    for k in d.keys():
+        if k.startswith('Tafel'):
+            del d[k]    
 
 ##save csv of FOM
 ##calculate V for critical I, etc
@@ -118,7 +135,37 @@ for count, d in enumerate(dlist):
     if len(istart_segs)==0:
         print 'no Tafel segments found for ', count, ',  sample ',  d['Sample']
         continue
-    ind=numpy.argmax(len_segs)
+    
+    #only take those segments covering a certain V range and with a min current for the top 10th of the V range in the segment and  positive slope for there on out and then take the steepest one.
+    ind=None
+    maxdy=0
+    npts=critsegVrange/dx
+    npts2=max(2, npts//10+1)
+    for count2, (it0, slen, dyv) in enumerate(zip(istart_segs, len_segs, fitdy_segs)):
+        #print '**', count2
+        #print slen
+        if slen<npts:
+            continue
+        it1=it0+slen
+        #print numpy.mean(i[it1-npts2:it1])
+        if numpy.mean(i[it1-npts2:it1])<critsegIend:
+            continue
+        #print numpy.mean(v[it1-npts2:it1])
+        if numpy.mean(v[it1-npts2:it1])<critsegVend:
+            continue
+        #print numpy.any(dy[it1:]<0.)
+        if numpy.any(dy[it1:]<0.):
+            continue
+        #print dyv, maxdy
+        if dyv>maxdy:
+            maxdy=dyv
+            ind=count2
+    if ind is None:
+        print 'no Tafel segments found for ', count, ',  sample ',  d['Sample']
+        continue
+    #just take the longest
+    #ind=numpy.argmax(len_segs)
+    
     i0=istart_segs[ind]
     i1=i0+len_segs[ind]
     tafinds=numpy.arange(i0, i1)
@@ -133,7 +180,7 @@ for count, d in enumerate(dlist):
     d['TafelEstart_TafelValue']=v[0]
     d['TafelFitVrange']=vt.max()-vt.min()
     d['TafelLogExCurrent']=fitint
-    
+
 #    for segd in d['segprops_dlist']:#[2:3]:
 #        for st, k in zip([':', '--', '-'], ['inds', 'TafelFitInds', 'TafelInds']):
 #            if not k in segd.keys():
@@ -174,7 +221,7 @@ for di in dinds:
         for st, k in zip([':', '--', '-'], ['inds', 'TafelFitInds', 'TafelInds']):
             if not k in segd.keys():
                 continue
-            x=d['Ewe(V)'][segd[k]]
+            x=d['Ewe(V)'][segd[k]]+vshift
             y=d['I(A)_LinSub'][segd[k]]
             posinds=numpy.where(y>5e-8)
             x=x[posinds]
@@ -183,6 +230,8 @@ for di in dinds:
         break
     smpl+=[d['Sample']]
     plotcount+=1
+    
+#pylab.show()
 
 
 savekeys=['TafelSlopeVperdec','TafelEstart_TafelValue','TafelFitVrange','TafelLogExCurrent']

@@ -17,13 +17,15 @@ from quaternary_FOM_bintern import *
 pylab.rc('font', family='serif', serif='Times New Roman')
 
 elkeys=['A', 'B', 'C', 'D']
-SYSTEM=67
+SYSTEM=561
+xsecbool=1
+
 #29,34,39
 pointsize=20
 opacity=.6
 view_azim=-159
 view_elev=30
-labelquat=True
+labelquat=False
 #permuteelements=[1, 2, 0, 3]
 permuteelements=[0, 1, 2, 3]
 allposn=True
@@ -906,14 +908,14 @@ elif SYSTEM==54:
 
 elif SYSTEM==55:
     ellabels=['Ni', 'Fe', 'Co', 'Ce']
-    os.chdir('C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoCe/results')
+    os.chdir('C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/results')
     rootstr='_V_IthreshCVLinSub_30.txt'
     expstr='V_IthreshCVLinSub_30'
     fomlabel='E for 3mA/cm$^2$ (mV vs E$_{OER}$)'
     fomshift=0.
     fommult=1000.
-    vmin=280
-    vmax=400
+    vmin=330
+    vmax=430
     cmap=cm.jet_r
     aboverangecolstr='k'
     belowrangecolstr='pink'
@@ -946,8 +948,8 @@ elif SYSTEM==561:
     fomlabel='E for 10mA/cm$^2$ (mV vs E$_{OER}$)'
     fomshift=-(.187-.045)
     fommult=1000.
-    vmin=375
-    vmax=475
+    vmin=380
+    vmax=480
     cmap=cm.jet_r
     aboverangecolstr='k'
     belowrangecolstr='pink'
@@ -1136,8 +1138,8 @@ elif SYSTEM==67:
     fomlabel='E for 10mA/cm$^2$ via CP (mV vs E$_{OER}$)'
     fomshift=-(.187-.044)
     fommult=1000.
-    vmin=355
-    vmax=440
+    vmin=360
+    vmax=460
     cmap=cm.jet_r
     aboverangecolstr='k'
     belowrangecolstr='pink'
@@ -1154,8 +1156,8 @@ elif SYSTEM==68:
     fomlabel='E for 1mA/cm$^2$ via CP (mV vs E$_{OER}$)'
     fomshift=-(.187-.044)
     fommult=1000.
-    vmin=320
-    vmax=440
+    vmin=290
+    vmax=390
     cmap=cm.jet_r
     aboverangecolstr='k'
     belowrangecolstr='pink'
@@ -1172,8 +1174,8 @@ elif SYSTEM==69:
     fomlabel='E for 19mA/cm$^2$ via CP (mV vs E$_{OER}$)'
     fomshift=-(.187-.046)
     fommult=1000.
-    vmin=385
-    vmax=520
+    vmin=380
+    vmax=480
     cmap=cm.jet_r
     aboverangecolstr='k'
     belowrangecolstr='pink'
@@ -1220,7 +1222,60 @@ elif SYSTEM==71:
     elkeys=['Ni', 'Fe', 'Co', 'Ce']
     view_azim=-151
     view_elev=20   
-    
+elif SYSTEM==77:
+    ellabels=['Ni', 'Fe', 'Co', 'Ce']
+    os.chdir('C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/20130612NiFeCoCesingle_6321/results')
+    rootstr='CP4Eave.txt'
+    expstr='CP4Eave'
+    fomlabel='E for 10mA/cm$^2$ via CP (mV vs E$_{OER}$)'
+    fomshift=-(.187-.044)
+    fommult=1000.
+    vmin=385
+    vmax=485
+    cmap=cm.jet_r
+    aboverangecolstr='k'
+    belowrangecolstr='pink'
+    savefolder=os.path.join(os.getcwd(), expstr)
+    binarylegloc=1
+    elkeys=['Ni', 'Fe', 'Co', 'Ce']
+    view_azim=-151
+    view_elev=20
+elif SYSTEM==78:
+    ellabels=['Ni', 'Fe', 'Co', 'Ce']
+    os.chdir('C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/20130612NiFeCoCesingle_6321/results')
+    rootstr='CP5Eave.txt'
+    expstr='CP5Eave'
+    fomlabel='E for 1mA/cm$^2$ via CP (mV vs E$_{OER}$)'
+    fomshift=-(.187-.044)
+    fommult=1000.
+    vmin=335
+    vmax=435
+    cmap=cm.jet_r
+    aboverangecolstr='k'
+    belowrangecolstr='pink'
+    savefolder=os.path.join(os.getcwd(), expstr)
+    binarylegloc=1
+    elkeys=['Ni', 'Fe', 'Co', 'Ce']
+    view_azim=-151
+    view_elev=20
+elif SYSTEM==79:
+    ellabels=['Ni', 'Fe', 'Co', 'Ce']
+    os.chdir('C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/20130612NiFeCoCesingle_6321/results')
+    rootstr='CP6Eave.txt'
+    expstr='CP6Eave'
+    fomlabel='E for 20mA/cm$^2$ via CP (mV vs E$_{OER}$)'
+    fomshift=-(.187-.044)
+    fommult=1000.
+    vmin=400
+    vmax=500
+    cmap=cm.jet_r
+    aboverangecolstr='k'
+    belowrangecolstr='pink'
+    savefolder=os.path.join(os.getcwd(), expstr)
+    binarylegloc=1
+    elkeys=['Ni', 'Fe', 'Co', 'Ce']
+    view_azim=-151
+    view_elev=20
 elif SYSTEM==80:
     ellabels=['Ni', 'Fe', 'Co', 'Ce']
     os.chdir('C:/Users/Public/Documents/EchemDropAnalyzedData/FCVdata/20130523 NiFeCoCe_3V_FCV_full_plate_4835')
@@ -1561,7 +1616,7 @@ pylab.ylabel(fomlabel, fontsize=16)
 pylab.title('PURE ELEMENTS. color=element(CMYK). #=thickness', fontsize=18)
 pylab.legend(loc=1)
 
-if 1:
+if xsecbool:
     quatxfig=pylab.figure()
     quatx=QuaternaryPlot(111, ellabels=ellabels, offset=0)
     cbax=quatxfig.add_axes((.83, .3, .04, .4))
@@ -1596,6 +1651,11 @@ if 1:
     quatx.scatter(compsselectx, c=fomselectx, s=20, cmap=cmap, norm=norm,  edgecolor='none')#vmin=vmin, vmax=vmax,
     cb=quatxfig.colorbar(quatx.mappable, cax=cbax, extend=extend, cmap=cmap, norm=norm)
     cb.set_label(fomlabel, fontsize=18)
+    
+    cbax=xsecfig.add_axes((.83, .3, .04, .4))
+    cb=quatxfig.colorbar(quatx.mappable, cax=cbax, extend=extend, cmap=cmap, norm=norm)
+    cb.set_label(fomlabel, fontsize=18)
+    
     quatx.set_projection(azim=view_azim, elev=view_elev)
     
 if SYSTEM==1:
@@ -1606,7 +1666,7 @@ if SYSTEM==6:
 if not os.path.exists(savefolder):
     os.mkdir(savefolder)
 os.chdir(savefolder)
-if 1:
+if 0:
     pylab.figure(fig.number)
     pylab.savefig('%s_PlatesAll_Posn.png' %expstr)
     for count, fg in enumerate(figquatall):
@@ -1630,7 +1690,14 @@ if 1:
     
     pylab.figure(purelfig.number)
     pylab.savefig('%s_pureelements.png' %expstr)
-
+    
+    if xsecbool:
+        pylab.figure(quatxfig.number)
+        pylab.savefig('%s_crossectionquat.png' %expstr)
+        
+        pylab.figure(xsecfig.number)
+        pylab.savefig('%s_crossection.png' %expstr)
+    
 if 0:
     os.chdir(savefolder)
     pylab.figure(fig.number)
@@ -1652,7 +1719,15 @@ if 0:
     
     pylab.figure(purelfig.number)
     pylab.savefig('%s_pureelements.eps' %expstr)
-if 0:
+    
+    if xsecbool:
+        pylab.figure(quatxfig.number)
+        pylab.savefig('%s_crossectionquat.eps' %expstr)
+        
+        pylab.figure(xsecfig.number)
+        pylab.savefig('%s_crossection.eps' %expstr)
+    
+if 1:
     pylab.figure(stpquat.ax.figure.number)
     pylab.savefig('%s_PlatesAll_Quat_hires.png' %expstr, dpi=600)
     pylab.figure(axl[0].figure.number)

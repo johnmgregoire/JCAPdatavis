@@ -31,9 +31,19 @@ from echem_plate_math import *
 #p='C:/Users/gregoire/Documents/EchemDropRawData/NiFeCeLa/20130424 NiFeCeLa_plate2 5825 B'
 #p='C:/Users/gregoire/Documents/EchemDropRawData/NiFeCeLa/20130423 NiFeCeLa_plate1_5836'
 
-#p='C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoCe/20130402NiFeCoCe_Plate1_5500'
-#p='C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoCe/20130403NiFeCoCe_Plate2_5498'
-p='C:/Users/gregoire/Documents/EchemDropRawData/NiFeCoCe/20130403NiFeCoCe_Plate3_4835'
+#p='C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/20130402NiFeCoCe_Plate1_5500'
+#p='C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/20130403NiFeCoCe_Plate2_5498'
+#p='C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/20130403NiFeCoCe_Plate3_4835'
+
+#p='C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/20130604NiFeCoCe/20130604NiFeCoCe_plate1_CV_6220'
+
+
+#p='C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/20130528NiFeCoCe3platerescan/20130529NiFeCoCe_plate1_5577'
+#p='C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/20130528NiFeCoCe3platerescan/20130603NiFeCoCe_plate2_5498'
+#p='C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/20130528NiFeCoCe3platerescan/20130528NiFeCoCe_plate3_4835'
+
+
+p='C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/20130612NiFeCoCesingle_6321/20130612NiFeCoCe_plate1_CVpostCP_6321'
 
 fld, fn=os.path.split(p)
 savep=os.path.join(os.path.join(fld, 'results'), fn+'_dlist.dat')
@@ -186,10 +196,13 @@ def calccurvregions_dlist(dlist, SGpts=10, critfracposcurve=.95, curvetol=3.e-5)
 #minslope=-1e-6
 
 #fastCV
-dydev_frac=.1
-dydev_nout=20
+#dydev_frac=.1
+dydev_frac=.02
+#dydev_nout=20
+dydev_nout=10
 dn_segstart=3*dydev_nout
-dydev_abs=2.e-5
+#dydev_abs=2.e-5
+dydev_abs=0.5e-5
 plotbool=0
 Vsegrange1=.1
 Vsegrange2=.1

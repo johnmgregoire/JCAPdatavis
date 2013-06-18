@@ -497,7 +497,7 @@ class quatsliceDialog(QDialog):
     def calcandplot(self):
         print '0'
         i=self.systemsinds[self.systemsComboBox.currentIndex()]
-        if self.selectsystem!=0 and (self.selectsystem is None or i!=self.selectsystem or self.selectsystem==-1):
+        if self.selectsystem is None or i==-1 or (i!=0 and i!=self.selectsystem):
             self.selectsystem=i
             self.dataclass.readdata(self.selectsystem, qparent=self)
             
@@ -794,7 +794,7 @@ class fomdatapreset():
             rootstr='201304'
             expstr='CP1Efin'
             fomlabel='V for 10 mA/cm$^2$ (V vs H$_2$0/O$_2$)'
-            fomshift=-.187
+            fomshift=-(.187-.045)
             fommult=1.
             vmin=.33
             vmax=.43
