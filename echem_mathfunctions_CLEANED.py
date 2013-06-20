@@ -63,3 +63,16 @@ def removeoutliers_meanstd(arr, nptsoneside, nsig, gapptsoneside=0):
                         dtype=arr.dtype)
    
     return arr
+
+""" gives you the average of the steadystate region """
+def CalcAvg(x, t, interval, numStdDevs, numPts, startAtEnd=0):
+    # if we wish to start the end, reverse the lists
+    if startAtEnd:
+        x = x[::-1]
+        t = t[::-1]
+    # restricts x to requested t-interval    
+    x = x[numpy.abs(t-t[0])<interval]
+    # removes outliers using mean and std
+    x=removeoutliers_meanstd(x, numPts//2, numStdDevs) # // = integer division
+    # the mean of the data now that outliers have been removed
+    return x.mean()
