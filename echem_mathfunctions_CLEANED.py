@@ -29,3 +29,37 @@ def removesinglepixoutliers(arr,critratiotoneighbors=1.5):
     c0=c[0]+1
     arr[c0]=(arr[c0-1]+arr[c0+1])/2
     return arr
+
+
+""" Averages a maximum of 2*nptoneside neighbor points for each datapoint. It
+    uses the datapoints distance from the mean of its neighbors of interest
+    and compares it to the the value that is within nsig stdivations from its
+    neighbors. If its within the range, it leaves the value, else it replaces it
+    with its neighbors mean. The gaptsoneside reduces the neighbors range and
+    nptsoneside increases it."""
+def removeoutliers_meanstd(arr, nptsoneside, nsig, gapptsoneside=0):
+    # only going to use the points directly beside to remove outliers
+    if nptsoneside==1 and gapptsoneside==0:
+        return removesinglepixoutliers(arr, critratiotoneighbors=nsig)
+    nsig=max(nsig, 1.)
+    nptsoneside=max(nptsoneside, 2.)
+    gapptsoneside=min(gapptsoneside, nptsoneside-2.)
+    # work up to decreasing the interval for removing outliers
+    # first interval could be something like (0,9) next (1,8) and then (2,7)
+    for gap in range(int(round(gapptsoneside+1))):
+        # create list of starts and finish for each datapoint
+        # combined they give a range that includes the neighbors and the datapoint
+        starti=numpy.uint32([max(i-(nptsoneside-gap), 0) for i in range(len(arr))])
+        stopi=numpy.uint32([min(i+(nptsoneside-gap)+1, len(arr)) for i in range(len(arr))])
+
+        # i is the index of the datapoint we're working on
+        # i0 is where the interval for the neighbors starts
+        # i1 is where the interval for the neighbors ends - not included
+        # numpy.append(arr[i0:i], arr[i+1:i1] is only the neighbors
+        arr=numpy.array([(((numpy.append(arr[i0:i], arr[i+1:i1]).mean()-arr[i]))**2\
+                          <(numpy.append(arr[i0:i], arr[i+1:i1]).std()*nsig)**2\
+                          and (arr[i],) or (numpy.append(arr[i0:i],arr[i+1:i1]).mean(),))[0]\
+                         for i, i0, i1 in zip(range(len(arr)), starti, stopi)],\
+                        dtype=arr.dtype)
+   
+    return arr
