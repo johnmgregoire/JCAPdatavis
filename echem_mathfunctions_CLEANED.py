@@ -76,3 +76,28 @@ def CalcAvg(x, t, interval, numStdDevs, numPts, startAtEnd=0):
     x=removeoutliers_meanstd(x, numPts//2, numStdDevs) # // = integer division
     # the mean of the data now that outliers have been removed
     return x.mean()
+
+""" Calculates the first E value at which I crosses the threshold. """
+def CalcE_IThresh(i, v, iThresh, numConsecPts,noThresh,setAbove=1):
+    if not setAbove: # 0 for below, 1 for above
+        i *= -1
+        iThresh *= -1
+    # returns and array of same size with each index having a 0 or 1
+    # if at that index i >= iThresh, than there is a 1 else a 0
+    keyPts = numpy.int16(i >= iThresh)
+    # Checks each index that can create a range of numConsecPts
+    # consecutive points. Range is then checked to see if everything
+    # in there is a 1. Only points that can create this range are in
+    # keyPtsConsec. 
+    keyPtsConsec = [keyPts[x:x+numConsecPts].prod()
+               for x in range(len(keyPts)-numConsecPts)]
+    # see if there is any range in there than is a 1
+    if True in keyPtsConsec:
+        # since there is, get the index
+        ival = keyPtsConsec.index(True)
+        # get this first range and return the mean
+        return v[ival:ival+numConsecPts].mean()
+    else:
+        # no range was found given the parameters, return noThresh
+        return noThresh
+
