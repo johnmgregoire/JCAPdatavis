@@ -9,15 +9,16 @@ PyCodePath=os.path.split(os.path.split(os.path.realpath(__file__))[0])[0]
 sys.path.append(os.path.join(PyCodePath,'ternaryplot'))
 from myternaryutility import TernaryPlot
 from myquaternaryutility import QuaternaryPlot
-from quaternary_FOM_stackedtern2 import *
+from quaternary_FOM_stackedtern10 import *
 from quaternary_FOM_stackedtern30 import *
 from quaternary_FOM_bintern import *
 #os.chdir(cwd)
 
-pylab.rc('font', family='serif', serif='Times New Roman')
+#pylab.rc('font', family='serif', serif='Times New Roman')
+pylab.rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 
 elkeys=['A', 'B', 'C', 'D']
-SYSTEM=561
+SYSTEM=68
 xsecbool=1
 
 #29,34,39
@@ -1157,7 +1158,7 @@ elif SYSTEM==68:
     fomshift=-(.187-.044)
     fommult=1000.
     vmin=290
-    vmax=390
+    vmax=415
     cmap=cm.jet_r
     aboverangecolstr='k'
     belowrangecolstr='pink'
@@ -1538,7 +1539,7 @@ cb.set_label(fomlabel, fontsize=20)
 
 
 
-axl, stpl=make10ternaxes(ellabels=ellabels)
+axl, stpl=make10ternaxes(ellabels=ellabels, fontsize=14)
 pylab.figure(figsize=(8, 8))
 stpquat=QuaternaryPlot(111, ellabels=ellabels)
 
@@ -1643,7 +1644,7 @@ if xsecbool:
         quatx.line(compverts[0], compverts[1])
         quatx.plotfomalonglineparameter(xsecax, lineparameter, fomselectx, compend1=compverts[0], compend2=compverts[1], lineparticks=numpy.linspace(0, 1, 4), ls='none', marker='.')
     elif calctype==1:
-        quatx.plotfominselectedplane(xsecax, xyparr, fomselectx, xyp_verts=xyp_verts, vertcomps_labels=[compverts[0], compverts[1], compverts[2]], s=20, edgecolor='none', cmap=cmap, norm=norm)
+        quatx.plotfominselectedplane(xsecax, xyparr, fomselectx, xyp_verts=xyp_verts, vertcomps_labels=[compverts[0], compverts[1], compverts[2]], s=28, edgecolor='none', cmap=cmap, norm=norm)
         quatx.line(compverts[0], compverts[1])
         quatx.line(compverts[0], compverts[2])
         quatx.line(compverts[2], compverts[1])
@@ -1666,7 +1667,7 @@ if SYSTEM==6:
 if not os.path.exists(savefolder):
     os.mkdir(savefolder)
 os.chdir(savefolder)
-if 0:
+if 1:
     pylab.figure(fig.number)
     pylab.savefig('%s_PlatesAll_Posn.png' %expstr)
     for count, fg in enumerate(figquatall):
@@ -1698,7 +1699,7 @@ if 0:
         pylab.figure(xsecfig.number)
         pylab.savefig('%s_crossection.png' %expstr)
     
-if 0:
+if 1:
     os.chdir(savefolder)
     pylab.figure(fig.number)
     pylab.savefig('%s_PlatesAll_Posn.eps' %expstr)
@@ -1710,6 +1711,7 @@ if 0:
     #pylab.savefig('%s_PlatesAll_Quat.svg' %expstr)
     pylab.figure(axl[0].figure.number)
     pylab.savefig('%s_stackedtern.eps' %expstr)
+    pylab.savefig('%s_stackedtern.svg' %expstr)
     
     pylab.figure(axl_tern[0].figure.number)
     pylab.savefig('%s_ternfaces.eps' %expstr)

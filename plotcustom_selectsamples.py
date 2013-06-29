@@ -11,6 +11,7 @@ from myquaternaryutility import QuaternaryPlot
 
 SYSTEM=21
 
+cabools=[0, 0, 0, 0, 0, 0]
 bmcpavebool=True
 if SYSTEM==-1:
     savefolder='C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/summarytemp'
@@ -25,6 +26,7 @@ elif SYSTEM==0:
     ylims=(-.8, 1.8)
     cvbools=[1, 1, 1, 1, 1, 0]
     cpbools=[1, 1, 1, 1, 1, 0]
+    cabools=[0, 0, 0, 0, 1, 0]
 elif SYSTEM==1:
     savefolder='C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/summary_sys1345'
     xlims=(250, 460)
@@ -43,6 +45,7 @@ elif SYSTEM==21:
     ylims=(-.8, 2.3)
     cvbools=[1, 0, 0, 0, 1, 1]
     cpbools=[1, 0, 0, 0, 1, 1]
+    cabools=[0, 0, 0, 0, 1, 0]
     bmcpavebool=False
 elif SYSTEM==3:
     savefolder='C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/summary_sys3CP5'
@@ -188,14 +191,14 @@ def allbmcpfig_sampleind(dallsamplei, avebool=True, plot2hr=True):#booleans not 
         xe=xarr.std(axis=0)
         y=numpy.log10(yarr.mean(axis=0))
         
-        pylab.errorbar(x, y, xerr=xe, ls='None', color='m', marker='s', mec='m', mfc='none', mew=.9, label='bmCP')
+        pylab.errorbar(x, y, xerr=xe, ls='None', marker='s', mec='m', mfc='m', mew=.9, label='bmCP')
     else:
         for count, (x, y) in enumerate(zip(xarr, yarr)):
             y=numpy.log10(y)
             if count==0:
-                pylab.plot(x, y, ls='None', color='m', marker=r'$'+`count+2`+'$', mfc='none', label='bmCP')
+                pylab.plot(x, y, ls='None', mec='m', mfc='m', marker=r'$'+`count+2`+'$', label='bmCP')
             else:
-                pylab.plot(x, y, ls='None', color='m', marker=r'$'+`count+2`+'$', mfc='none')
+                pylab.plot(x, y, ls='None', mec='m', mfc='m', marker=r'$'+`count+2`+'$')
 
     if plot2hr:
         d1=dall5['bm2hrcp'][dallinds5['bm2hrcp'][dallsamplei]]
@@ -211,16 +214,38 @@ def allbmcpfig_sampleind(dallsamplei, avebool=True, plot2hr=True):#booleans not 
         xe2=xarr.std()
         y2=numpy.log10(yarr.mean())
         if avebool:
-            pylab.errorbar(x2, y2, xerr=xe2, ls='None', color='m', marker='s', mec='m', mfc='m', mew=.9, label='bmCP 2hr')
+            pylab.errorbar(x2, y2, xerr=xe2, ls='None', marker='s', mec='m', mfc='m', mew=.9, label='bmCP 2hr')
         else:
             for count, (x, y) in enumerate(zip(xarr, yarr)):
                 y=numpy.log10(y)
                 if count==0:
-                    pylab.plot(x, y, ls='None', color='m', marker=r'$'+`count+2`+"'$", mfc='none', label='bmCP 2hr')
+                    pylab.plot(x, y, ls='None', mec='m', mfc='m', marker=r'$'+`count+2`+"'$", label='bmCP 2hr')
                 else:
-                    pylab.plot(x, y, ls='None', color='m', marker=r'$'+`count+2`+"'$", mfc='none')
+                    pylab.plot(x, y, ls='None', mec='m', mfc='m', marker=r'$'+`count+2`+"'$")
 
-    
+def allbmcafig_sampleind(dallsamplei, avebool=True):#booleans not implemented yet
+    d1=dall5['bmstepca'][dallinds5['bmstepca'][dallsamplei]]
+    xarr=[]
+    yarr=[]
+    for k in ['complete02', 'complete03', 'complete04']:
+        d=d1[k]
+        xarr+=[d['Ewe(VOER)']*1000.]
+        yarr+=[d['I(mAcm2)']]
+    xarr=numpy.array(xarr)
+    yarr=numpy.array(yarr)
+    if avebool:
+        x=xarr.mean(axis=0)
+        xe=xarr.std(axis=0)
+        y=numpy.log10(yarr.mean(axis=0))
+        pylab.errorbar(x, y, xerr=xe, ls='None', marker='s', mec='m', mfc='m', mew=.9, label='bmCA')
+    else:
+        for count, (x, y) in enumerate(zip(xarr, yarr)):
+            y=numpy.log10(y)
+            if count==0:
+                pylab.plot(x, y, ls='None', mec='pink', mfc='pink', marker=r'$'+`count+2`+'$', label='bmCA')
+            else:
+                pylab.plot(x, y, ls='None', mec='pink', mfc='pink', marker=r'$'+`count+2`+'$')
+                
 def allLogIvsVfig_sampleind(dallsamplei, cvsmoothpts=8, cvbools=[1, 1, 1, 1, 1, 1], cpbools=[1, 1, 1, 1, 1, 1]):
     
     d=dall1['CV3'][dallinds1['CV3'][dallsamplei]]
@@ -410,7 +435,11 @@ if cpbools[4]:
     for dallsamplei in range(3):
         pylab.figure(num=dallsamplei)
         allbmcpfig_sampleind(dallsamplei, avebool=bmcpavebool, plot2hr=True)
-
+if cabools[4]:
+    for dallsamplei in range(3):
+        pylab.figure(num=dallsamplei)
+        allbmcafig_sampleind(dallsamplei, avebool=bmcpavebool)
+        
 if cvbools[4]:
     for dallsamplei in range(3):
         pylab.figure(num=dallsamplei)
