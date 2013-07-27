@@ -66,6 +66,8 @@ sys.path.append(os.path.join(PyCodePath,'ternaryplot'))
 from myternaryutility import TernaryPlot
 from myquaternaryutility import QuaternaryPlot
 from quaternary_FOM_stackedtern2 import *
+from quaternary_FOM_stackedtern5 import *
+from quaternary_FOM_stackedtern20 import *
 from quaternary_FOM_stackedtern30 import *
 
 
@@ -211,54 +213,42 @@ class MainMenu(QMainWindow):
         #self.setupUi(self)
         self.setWindowTitle('Quaternay composition slices and FOM visualization')
         
-        echem30_select=echem30axesWidget(self, ellabels=ellabels)
-        echem30_select.show()
-        echem30_all=echem30axesWidget(self, ellabels=ellabels)
-        echem30_all.show()
+        numslices=userinputcaller(self, inputs=[('Number of comp slices (5,10,20,30)', int, '30')], title='Choose visualization of composition space',  cancelallowed=False)[0]
+
+
+        echem_all=echemmultiaxesWidget(self, ellabels=ellabels, numslices=numslices)
+        echem_select=echemmultiaxesWidget(self, ellabels=ellabels, numslices=numslices)
         
-        self.echem=quatsliceDialog(self, echem30_select, echem30_all, ellabels=ellabels, **kwargs)
+        echem_select.show()
+        echem_all.show()
+        
+        self.echem=quatsliceDialog(self, echem_select, echem_all, ellabels=ellabels, **kwargs)
         self.echem.show()
         #if execute:
             #self.echem.exec_()
 
 
-class echem10axesWidget(QDialog):
-    def __init__(self, parent=None, ellabels=['A', 'B', 'C', 'D']):
-        super(echem10axesWidget, self).__init__(parent)
+class echemmultiaxesWidget(QDialog):
+    def __init__(self, parent=None, ellabels=['A', 'B', 'C', 'D'], buttons=True, numslices=30):
+        super(echemmultiaxesWidget, self).__init__(parent)
         
-        mainlayout=QVBoxLayout()
-        
-        self.plotw=plotwidget(self)
-        self.plotw.fig.clf()
-        self.axl, self.stpl=make10ternaxes(fig=self.plotw.fig, ellabels=ellabels)
-        
-        mainlayout.addWidget(self.plotw)
-        
-        self.buttonBox = QDialogButtonBox(self)
-        self.buttonBox.setGeometry(QRect(520, 195, 160, 26))
-        self.buttonBox.setOrientation(Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QDialogButtonBox.Ok)
-        QObject.connect(self.buttonBox, SIGNAL("accepted()"), self.accept)
-        mainlayout.addWidget(self.buttonBox)
-        
-        self.setLayout(mainlayout)
-    
-    def plot(self, d, cb=True):
-        if 'fomlabel' in d.keys():
-            cblabel=d['fomlabel']
+        if numslices==5:
+            self.maketernaxes=make10ternaxes
+            self.scatter_axes=scatter_10axes
+        elif numslices==10:
+            self.maketernaxes=make10ternaxes
+            self.scatter_axes=scatter_10axes
+        elif numslices==20:
+            self.maketernaxes=make20ternaxes
+            self.scatter_axes=scatter_20axes
         else:
-            cblabel=''
-        scatter_10axes(d['comps'], d['fom'], self.stpl, s=18, edgecolors='none', cb=cb, cblabel=cblabel, cmap=d['cmap'], norm=d['norm'])
-
-class echem30axesWidget(QDialog):
-    def __init__(self, parent=None, ellabels=['A', 'B', 'C', 'D'], buttons=True):
-        super(echem30axesWidget, self).__init__(parent)
-        
+            self.maketernaxes=make30ternaxes
+            self.scatter_axes=scatter_30axes
         mainlayout=QVBoxLayout()
         self.ellabels=ellabels
         self.plotw=plotwidget(self)
         self.plotw.fig.clf()
-        self.axl, self.stpl=make30ternaxes(fig=self.plotw.fig, ellabels=self.ellabels)
+        self.axl, self.stpl=self.maketernaxes(fig=self.plotw.fig, ellabels=self.ellabels)
         
         mainlayout.addWidget(self.plotw)
         if buttons:
@@ -277,7 +267,7 @@ class echem30axesWidget(QDialog):
             cblabel=d['fomlabel']
         else:
             cblabel=''
-        scatter_30axes(d['comps'], d['fom'], self.stpl, s=18, edgecolors='none', cb=cb, cblabel=cblabel, cmap=d['cmap'], norm=d['norm'])
+        self.scatter_axes(d['comps'], d['fom'], self.stpl, s=18, edgecolors='none', cb=cb, cblabel=cblabel, cmap=d['cmap'], norm=d['norm'])
         
     def clearandplot(self, d, cb=True, ellabels=None):
         if 'fomlabel' in d.keys():
@@ -287,8 +277,8 @@ class echem30axesWidget(QDialog):
         self.plotw.fig.clf()
         if not ellabels is None:
             self.ellabels=ellabels
-        self.axl, self.stpl=make30ternaxes(fig=self.plotw.fig, ellabels=self.ellabels)
-        scatter_30axes(d['comps'], d['fom'], self.stpl, s=18, edgecolors='none', cb=cb, cblabel=cblabel, cmap=d['cmap'], norm=d['norm'])
+        self.axl, self.stpl=self.maketernaxes(fig=self.plotw.fig, ellabels=self.ellabels)
+        self.scatter_axes(d['comps'], d['fom'], self.stpl, s=18, edgecolors='none', cb=cb, cblabel=cblabel, cmap=d['cmap'], norm=d['norm'])
         self.plotw.fig.canvas.draw()
     
     def clickprocess(self, coords_button):

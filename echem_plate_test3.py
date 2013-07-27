@@ -43,7 +43,9 @@ from echem_plate_math import *
 #p='C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/20130528NiFeCoCe3platerescan/20130528NiFeCoCe_plate3_4835'
 
 
-p='C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/20130612NiFeCoCesingle_6321/20130612NiFeCoCe_plate1_CVpostCP_6321'
+#p='C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/20130612NiFeCoCesingle_6321/20130612NiFeCoCe_plate1_CVpostCP_6321'
+
+p='C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/20130604NiFeCoCe/20130628NiFeCoCe_plate1_selectCVs_6220/data2'
 
 fld, fn=os.path.split(p)
 savep=os.path.join(os.path.join(fld, 'results'), fn+'_dlist.dat')
