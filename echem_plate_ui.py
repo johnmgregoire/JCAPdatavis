@@ -414,7 +414,13 @@ class echemvisDialog(QDialog):
         ['Iphoto', ['Illum', 'I(A)', 'Ewe(V)', 't(s)'], [['frac of Illum segment start', float, '0.4'], ['frac of Illum segment end', float, '0.95'], ['frac of Dark segment start', float, '0.4'], ['frac of Dark segment end', float, '0.95'], ['Illum signal key', str, 'Ach(V)'], ['Illum signal time shift (s)', float, '0.'], ['Illum Threshold', float, '0.8'], ['Illum Invert', int, '1']]], \
         ]
         
-        self.expmnt_calc_options=[['OCV', OCVops], ['CP', CPops], ['CA', CAops], ['CV', CVops]]
+        Bubbleops=[\
+        ['slopefin', ['Maxslope'], []], \
+        ['Intfin', ['Intensity'], []], \
+        ]
+        
+        
+        self.expmnt_calc_options=[['OCV', OCVops], ['CP', CPops], ['CA', CAops], ['CV', CVops], ['Bubble', Bubbleops]]
         self.expmnt_calc_lastusedvals=[[[] for calcopt in opslist] for opname, opslist in self.expmnt_calc_options]
         expmntComboBoxLabel=QLabel()
         expmntComboBoxLabel.setText('Technique type:')
@@ -439,7 +445,9 @@ class echemvisDialog(QDialog):
         
         self.xplotchoiceComboBox=QComboBox()
         self.yplotchoiceComboBox=QComboBox()
-        for i, nam in enumerate(['t(s)', 'I(A)', 'Ewe(V)', 'Ece(V)', 'Ewe-E0(V)', 'I*Is(A)']):
+        self.plotkeys=['t(s)', 'I(A)', 'Ewe(V)', 'Ece(V)', 'Ewe-E0(V)', 'I*Is(A)']
+        #keys=['Intensity', 'Fit', 'Maxslope']
+        for i, nam in enumerate(self.plotkeys):
             self.xplotchoiceComboBox.insertItem(i, nam)
             self.yplotchoiceComboBox.insertItem(i, nam)
         self.xplotchoiceComboBox.setCurrentIndex(0)
@@ -890,19 +898,35 @@ class echemvisDialog(QDialog):
 
         inds=numpy.argsort(getarrfromkey(dlist, 'mtime'))
         self.techniquedictlist=[dlist[i] for i in inds]
-
+        if len(self.techniquedictlist)>0:
+            d=self.techniquedictlist[0]
+            maxlen=max([len(v) for k, v in d.items() if isinstance(v, numpy.ndarray)])
+            plotkeys=set([k for k, v in d.items() if isinstance(v, numpy.ndarray) and len(v)==maxlen])
+            #plotkeys=set(.keys())-set(['path', 'mtime'])
+            if set(self.plotkeys)!=plotkeys:
+                self.plotkeys=list(plotkeys)
+                self.xplotchoiceComboBox.clear()
+                self.yplotchoiceComboBox.clear()
+                for i, nam in enumerate(self.plotkeys):
+                    self.xplotchoiceComboBox.insertItem(i, nam)
+                    self.yplotchoiceComboBox.insertItem(i, nam)
+                self.xplotchoiceComboBox.setCurrentIndex(0)
+                self.yplotchoiceComboBox.setCurrentIndex(1)
     def getepoch_path(self, p, readbytes=1000):
-        #print os.path.exists(p), p
-        try:#need to sometimes try twice so might as well try 3 times
-            f=open(p, mode='r')
-        except:
-            try:
+        try:
+            #print os.path.exists(p), p
+            try:#need to sometimes try twice so might as well try 3 times
                 f=open(p, mode='r')
             except:
-                f=open(p, mode='r')
-        s=f.read(readbytes)
-        f.close()
-        return eval (s.partition('Epoch=')[2].partition('\n')[0].strip())
+                try:
+                    f=open(p, mode='r')
+                except:
+                    f=open(p, mode='r')
+            s=f.read(readbytes)
+            f.close()
+            return eval (s.partition('Epoch=')[2].partition('\n')[0].strip())
+        except:
+            return 0.
     
     def calcandplotwithupdate(self, ext='.txt'):
         self.calcandplot(ext='.txt', dbupdate=True)
@@ -1135,7 +1159,10 @@ class echemvisDialog(QDialog):
         t=d['mtime']-2082844800.
         print '^^^^^^^^', t
         if not isinstance(t, str):
-            t=time.ctime(t)
+            try:
+                t=time.ctime(t)
+            except:
+                t='error'
         print t
         self.daqtimeLineEdit.setText(t)
 
