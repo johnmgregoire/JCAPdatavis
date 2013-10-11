@@ -62,13 +62,15 @@ def autocolorbarformat(lims, ndec=3):
 wd=os.getcwd()
 
 
-sys.path.append(os.path.join(PyCodePath,'ternaryplot'))
+sys.path.append(os.path.join(PyCodePath,'PythonCompositionPlots'))
 from myternaryutility import TernaryPlot
 from myquaternaryutility import QuaternaryPlot
 from quaternary_FOM_stackedtern2 import *
+from quaternary_FOM_stackedtern20 import *
 from quaternary_FOM_stackedtern30 import *
+from quaternary_FOM_bintern import *
 
-sys.path.append(os.path.join(PyCodePath,'dbcomm'))
+sys.path.append(os.path.join(PyCodePath,'JCAPPyDBComm'))
 from mysql_dbcommlib import *
 
 sys.path.append(os.path.join(PyCodePath, 'PythonCodeSecureFiles'))
@@ -291,6 +293,34 @@ class echem10axesWidget(QDialog):
         else:
             cblabel=''
         scatter_10axes(d['comps'], d['fom'], self.stpl, s=18, edgecolors='none', cb=cb, cblabel=cblabel, cmap=d['cmap'], norm=d['norm'])
+        
+class echem20axesWidget(QDialog):
+    def __init__(self, parent=None, ellabels=['A', 'B', 'C', 'D']):
+        super(echem20axesWidget, self).__init__(parent)
+        
+        mainlayout=QVBoxLayout()
+        
+        self.plotw=plotwidget(self)
+        self.plotw.fig.clf()
+        self.axl, self.stpl=make20ternaxes(fig=self.plotw.fig, ellabels=ellabels)
+        
+        mainlayout.addWidget(self.plotw)
+        
+        self.buttonBox = QDialogButtonBox(self)
+        self.buttonBox.setGeometry(QRect(520, 195, 160, 26))
+        self.buttonBox.setOrientation(Qt.Horizontal)
+        self.buttonBox.setStandardButtons(QDialogButtonBox.Ok)
+        QObject.connect(self.buttonBox, SIGNAL("accepted()"), self.accept)
+        mainlayout.addWidget(self.buttonBox)
+        
+        self.setLayout(mainlayout)
+    
+    def plot(self, d, cb=True):
+        if 'fomlabel' in d.keys():
+            cblabel=d['fomlabel']
+        else:
+            cblabel=''
+        scatter_20axes(d['comps'], d['fom'], self.stpl, s=18, edgecolors='none', cb=cb, cblabel=cblabel, cmap=d['cmap'], norm=d['norm'])
 
 class echem30axesWidget(QDialog):
     def __init__(self, parent=None, ellabels=['A', 'B', 'C', 'D']):
@@ -321,6 +351,66 @@ class echem30axesWidget(QDialog):
         scatter_30axes(d['comps'], d['fom'], self.stpl, s=18, edgecolors='none', cb=cb, cblabel=cblabel, cmap=d['cmap'], norm=d['norm'])
         
         
+class echem4axesWidget(QDialog):
+    def __init__(self, parent=None, ellabels=['A', 'B', 'C', 'D']):
+        super(echem4axesWidget, self).__init__(parent)
+        
+        mainlayout=QVBoxLayout()
+        
+        self.plotw=plotwidget(self)
+        self.plotw.fig.clf()
+        self.axl, self.stpl=make4ternaxes(fig=self.plotw.fig, ellabels=ellabels)
+        
+        mainlayout.addWidget(self.plotw)
+        
+        self.buttonBox = QDialogButtonBox(self)
+        self.buttonBox.setGeometry(QRect(520, 195, 160, 26))
+        self.buttonBox.setOrientation(Qt.Horizontal)
+        self.buttonBox.setStandardButtons(QDialogButtonBox.Ok)
+        QObject.connect(self.buttonBox, SIGNAL("accepted()"), self.accept)
+        mainlayout.addWidget(self.buttonBox)
+        
+        self.setLayout(mainlayout)
+    
+    def plot(self, d, cb=True):
+        if 'fomlabel' in d.keys():
+            cblabel=d['fomlabel']
+        else:
+            cblabel=''
+        scatter_4axes(d['comps'], d['fom'], self.stpl, edgecolors='none', cb=cb, cblabel=cblabel, cmap=d['cmap'], norm=d['norm'])
+
+
+class echembinWidget(QDialog):
+    def __init__(self, parent=None, ellabels=['A', 'B', 'C', 'D']):
+        super(echembinWidget, self).__init__(parent)
+        
+        mainlayout=QVBoxLayout()
+        
+        self.plotw=plotwidget(self)
+        self.plotw.fig.clf()
+        self.axbin, self.axbininset=plotbinarylines_axandinset(fig=self.plotw.fig, ellabels=ellabels)
+        
+        mainlayout.addWidget(self.plotw)
+        
+        self.buttonBox = QDialogButtonBox(self)
+        self.buttonBox.setGeometry(QRect(520, 195, 160, 26))
+        self.buttonBox.setOrientation(Qt.Horizontal)
+        self.buttonBox.setStandardButtons(QDialogButtonBox.Ok)
+        QObject.connect(self.buttonBox, SIGNAL("accepted()"), self.accept)
+        mainlayout.addWidget(self.buttonBox)
+        
+        self.setLayout(mainlayout)
+    
+    def plot(self, d, cb=True, ellabels=['A', 'B', 'C', 'D']):
+        if 'fomlabel' in d.keys():
+            cblabel=d['fomlabel']
+        else:
+            cblabel=''
+        plotbinarylines_quat(self.axbin, d['comps'], d['fom'], markersize=10, ellabels=d['ellabels'], linewidth=2)
+        self.axbin.set_xlabel('binary composition', fontsize=16)
+        self.axbin.set_ylabel(cblabel, fontsize=16)
+        
+        
 class echemvisDialog(QDialog):
     def __init__(self, parent=None, title='', folderpath=None):
         super(echemvisDialog, self).__init__(parent)
@@ -328,6 +418,9 @@ class echemvisDialog(QDialog):
 #        self.echem30=echem30axesWidget()
 #        self.echem30.show()
         self.plotillumkey=None
+        
+        #Remove next line to enable DB
+        folderpath=PyCodePath
         if folderpath is None:
             self.dbdatasource=userinputcaller(self, inputs=[('DBsource?', bool, '1')], title='Change to 0 to read for local harddrive.')[0]
             if self.dbdatasource:
@@ -535,9 +628,21 @@ class echemvisDialog(QDialog):
         stackedtern10Button.setText("Create stacked\ntern at 10%")
         QObject.connect(stackedtern10Button, SIGNAL("pressed()"), self.stackedtern10window)
         
+        stackedtern20Button=QPushButton()
+        stackedtern20Button.setText("Create stacked\ntern at 5%")
+        QObject.connect(stackedtern20Button, SIGNAL("pressed()"), self.stackedtern20window)
+        
         stackedtern30Button=QPushButton()
         stackedtern30Button.setText("Create stacked\ntern at 3.33%")
         QObject.connect(stackedtern30Button, SIGNAL("pressed()"), self.stackedtern30window)
+        
+        tern4Button=QPushButton()
+        tern4Button.setText("Create ternary\nfaces")
+        QObject.connect(tern4Button, SIGNAL("pressed()"), self.tern4window)
+
+        binlinesButton=QPushButton()
+        binlinesButton.setText("Create binary\nlines")
+        QObject.connect(binlinesButton, SIGNAL("pressed()"), self.binlineswindow)        
         
         templab=QLabel()
         templab.setText('E0=Equil.Pot.(V):')
@@ -629,16 +734,19 @@ class echemvisDialog(QDialog):
         ctrllayout.addLayout(daqtimelayout, i+4, 0)
         ctrllayout.addWidget(stackedtern10Button, i+4, 1)
         ctrllayout.addWidget(stackedtern30Button, i+4, 2)
+        ctrllayout.addWidget(stackedtern20Button, i+5, 0)
+        ctrllayout.addWidget(tern4Button, i+5, 1)
+        ctrllayout.addWidget(binlinesButton, i+5, 2)
         
-        ctrllayout.addLayout(E0layout, i+5, 0, 1, 2)
-        ctrllayout.addLayout(Islayout, i+5, 2, 1, 2)
+        ctrllayout.addLayout(E0layout, i+6, 0, 1, 2)
+        ctrllayout.addLayout(Islayout, i+6, 2, 1, 2)
         
-        ctrllayout.addWidget(selectbuttonlab, i+6, 0)
+        ctrllayout.addWidget(selectbuttonlab, i+7, 0)
         #ctrllayout.addLayout(selectsamplelayout, i+6, 1, 1, 2)
-        ctrllayout.addWidget(selectsamplelab, i+6, 1, 1, 2)
+        ctrllayout.addWidget(selectsamplelab, i+7, 1, 1, 2)
         
-        ctrllayout.addLayout(selectbuttonlayout, i+7, 0)
-        ctrllayout.addWidget(self.selectsamplesLineEdit, i+7, 1, 1, 2)
+        ctrllayout.addLayout(selectbuttonlayout, i+8, 0)
+        ctrllayout.addWidget(self.selectsamplesLineEdit, i+8, 1, 1, 2)
         
         mainlayout.addLayout(ctrllayout, 0, 0)
         mainlayout.addWidget(self.plotw_select, 0, 1)
@@ -1101,6 +1209,24 @@ class echemvisDialog(QDialog):
         #scatter_30axes(d['comps'], d['fom'], self.echem30.stpl, s=18, edgecolors='none', cmap=d['cmap'], norm=d['norm'])
         #self.echem30.show()
         self.echem30.exec_()
+
+    def stackedtern20window(self):
+        d=self.stackedternplotdict
+        self.echem20=echem20axesWidget(parent=None, ellabels=d['ellabels'])
+        self.echem20.plot(d, cb=True)
+        self.echem20.exec_()
+
+    def tern4window(self):
+        d=self.stackedternplotdict
+        self.echem4=echem4axesWidget(parent=None, ellabels=d['ellabels'])
+        self.echem4.plot(d, cb=True)
+        self.echem4.exec_()
+
+    def binlineswindow(self):
+        d=self.stackedternplotdict
+        self.echembin=echembinWidget(parent=None, ellabels=d['ellabels'])
+        self.echembin.plot(d, cb=True)
+        self.echembin.exec_()
 
     def plotselect(self):
         overlaybool=self.overlayselectCheckBox.isChecked()
