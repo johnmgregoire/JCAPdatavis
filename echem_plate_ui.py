@@ -68,7 +68,7 @@ from myquaternaryutility import QuaternaryPlot
 from quaternary_FOM_stackedtern2 import *
 from quaternary_FOM_stackedtern30 import *
 
-sys.path.append(os.path.join(PyCodePath,'dbcomm'))
+sys.path.append(os.path.join(PyCodePath,'JCAPPyDBComm'))
 from mysql_dbcommlib import *
 
 sys.path.append(os.path.join(PyCodePath, 'PythonCodeSecureFiles'))

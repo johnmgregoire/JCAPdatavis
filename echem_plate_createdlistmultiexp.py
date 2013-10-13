@@ -58,22 +58,32 @@ from echem_plate_math import *
 #samples=[169, 170, 725, 1326, 1329]+range(2049, 2056)+range(2057, 2064)+range(2065, 2072)+range(2073, 2079)
 #savep='C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/20130610NiFeCoCesingle_6321/results/selectsamplesnesteddlist.pck'
 
-##system 5
-dlistinfo=[\
-    (['C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/benchmarking/benchmarkingCVs_dlist.pck'], 'bmcv'), \
-    (['C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/benchmarking/benchmarkingstepCPs_dlist.pck'], 'bmstepcp'), \
-    (['C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/benchmarking/benchmarkingstepCAs_dlist.pck'], 'bmstepca'), \
-    (['C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/benchmarking/benchmarking2hrCP_dlist.pck'], 'bm2hrcp'), \
-]
-samples=[170, 725, 1326]
-savep='C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/benchmarking/selectsamplesnesteddlist.pck'
-
-##system 6
+###system 5
 #dlistinfo=[\
-#    (['C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/yunsamples/yunCV_dlist.pck'], 'CV'), \
+#    (['C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/benchmarking/benchmarkingCVs_dlist.pck'], 'bmcv'), \
+#    (['C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/benchmarking/benchmarkingstepCPs_dlist.pck'], 'bmstepcp'), \
+#    (['C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/benchmarking/benchmarkingstepCAs_dlist.pck'], 'bmstepca'), \
+#    (['C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/benchmarking/benchmarking2hrCP_dlist.pck'], 'bm2hrcp'), \
 #]
-#samples=[169, 170, 725, 1326, 1329]+range(2049, 2056)+range(2057, 2064)+range(2065, 2072)+range(2073, 2079)
-#savep='C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/yunsamples/selectsamplesnesteddlist.pck'
+#samples=[170, 725, 1326]
+#savep='C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/benchmarking/selectsamplesnesteddlist.pck'
+
+#system 6
+dlistinfo=[\
+    (['C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/yunsamples/NaOH/yunCV_dlist_NaOH.pck'], 'CV'), \
+    (['C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/yunsamples/NaOH/yunCP_dlist_NaOH.pck'], 'CP'), \
+    (['C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/yunsamples/NaOH/yunfirstCV_dlist_NaOH.pck'], '1CV'), \
+    (['C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/yunsamples/NaOH/yunsecCV_dlist_NaOH.pck'], '2CV'), \
+]
+samples=[169, 170, 725, 1326, 1329]+range(2049, 2056)+range(2057, 2064)+range(2065, 2072)+range(2073, 2079)
+savep='C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/yunsamples/NaOH/selectsamplesnesteddlist.pck'
+
+##system 7
+#dlistinfo=[\
+#    (['C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/20130612NiFeCoCesingle_6321/results/20130612NiFeCoCe_plate1_CVpostCP_6321_dlist.dat'], 'CV3redox'), \
+#]
+#samples=[169, 170, 725, 1326, 1329]
+#savep='C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/20130612NiFeCoCesingle_6321/results/selectsamplesnesteddlist.pck'
 
 dall={}
 for pl, lab in dlistinfo:
