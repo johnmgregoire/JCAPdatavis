@@ -388,8 +388,8 @@ class echemvisDialog(QDialog):
         ['E_Ithresh', ['I(A)','Ewe(V)'], [['Ithresh(A)', float, '1e-5'], ['Num consec points', int, '20'], ['0 for below, 1 for above', int, '1'], ['Thresh not reached value', float, '1']]], \
         ['Eh in I=Io Exp(E/Eh)', ['I(A)', 'Ewe(V)'], []], \
         ['Io in I=Io Exp(E/Eh)', ['I(A)', 'Ewe(V)'], []], \
-        ['Iphoto_max', ['Illum', 'I(A)', 'Ewe(V)', 't(s)'], [['frac of Illum segment start', float, '0.4'], ['frac of Illum segment end', float, '0.95'], ['frac of Dark segment start', float, '0.4'], ['frac of Dark segment end', float, '0.95'], ['Illum signal key', str, 'Ach(V)'], ['Illum signal time shift (s)', float, '0.'], ['Illum Threshold', float, '0.8'], ['Illum Invert', int, '1']]], \
-        ['Iphoto_min', ['Illum', 'I(A)', 'Ewe(V)', 't(s)'], [['frac of Illum segment start', float, '0.4'], ['frac of Illum segment end', float, '0.95'], ['frac of Dark segment start', float, '0.4'], ['frac of Dark segment end', float, '0.95'], ['Illum signal key', str, 'Ach(V)'], ['Illum signal time shift (s)', float, '0.'], ['Illum Threshold', float, '0.8'], ['Illum Invert', int, '1']]], \
+        ['Iphoto_max', ['Illum', 'I(A)', 'Ewe(V)', 't(s)'], [['frac of Illum segment start', float, '0.4'], ['frac of Illum segment end', float, '0.95'], ['frac of Dark segment start', float, '0.4'], ['frac of Dark segment end', float, '0.95'], ['Illum signal key', str, 'Ach(V)'], ['Illum signal time shift (s)', float, '0.'], ['Illum Threshold', float, '0.8'], ['Illum Invert', int, '1'], ['num illum cycles', int, '99'], ['0 from beginning, 1 from end', int, '1']]], \
+        ['Iphoto_min', ['Illum', 'I(A)', 'Ewe(V)', 't(s)'], [['frac of Illum segment start', float, '0.4'], ['frac of Illum segment end', float, '0.95'], ['frac of Dark segment start', float, '0.4'], ['frac of Dark segment end', float, '0.95'], ['Illum signal key', str, 'Ach(V)'], ['Illum signal time shift (s)', float, '0.'], ['Illum Threshold', float, '0.8'], ['Illum Invert', int, '1'], ['num illum cycles', int, '99'], ['0 from beginning, 1 from end', int, '1']]], \
         ['None', ['I(A)', 'Ewe(V)'], []], \
         ]
         
@@ -397,21 +397,21 @@ class echemvisDialog(QDialog):
         ['Efin', ['Ewe(V)'], []], \
         ['Eave', ['Ewe(V)', 't(s)'], [['Interval(s)', float, '2.'], ['Num StdDev outlier', float, '2.'], ['Num Pts in Window', int, '999999'], ['0 from beginning, 1 from end', int, '1']]], \
         ['Ess', ['Ewe(V)'], [['Weight Exponent for NumPts', float, '1.'], ['NumPts test interval', int, '10']]], \
-        ['Ephoto', ['Illum', 'Ewe(V)', 'I(A)', 't(s)'], [['frac of Illum segment start', float, '0.4'], ['frac of Illum segment end', float, '0.95'], ['frac of Dark segment start', float, '0.4'], ['frac of Dark segment end', float, '0.95'], ['Illum signal key', str, 'Ach(V)'], ['Illum signal time shift (s)', float, '0.'], ['Illum Threshold', float, '0.8'], ['Illum Invert', int, '1']]], \
+        ['Ephoto', ['Illum', 'Ewe(V)', 'I(A)', 't(s)'], [['frac of Illum segment start', float, '0.4'], ['frac of Illum segment end', float, '0.95'], ['frac of Dark segment start', float, '0.4'], ['frac of Dark segment end', float, '0.95'], ['Illum signal key', str, 'Ach(V)'], ['Illum signal time shift (s)', float, '0.'], ['Illum Threshold', float, '0.8'], ['Illum Invert', int, '1'], ['num illum cycles', int, '99'], ['0 from beginning, 1 from end', int, '1']]], \
         ]
         
         CPops=[\
         ['Efin', ['Ewe(V)'], []], \
         ['Eave', ['Ewe(V)', 't(s)'],  [['Interval(s)', float, '2.'], ['Num StdDev outlier', float, '2.'], ['Num Pts in Window', int, '999999'], ['0 from beginning, 1 from end', int, '1']]], \
         ['Ess', ['Ewe(V)'], [['Weight Exponent for NumPts', float, '1.'], ['NumPts test interval', int, '10']]], \
-        ['Ephoto', ['Illum', 'Ewe(V)', 'I(A)', 't(s)'], [['frac of Illum segment start', float, '0.4'], ['frac of Illum segment end', float, '0.95'], ['frac of Dark segment start', float, '0.4'], ['frac of Dark segment end', float, '0.95'], ['Illum signal key', str, 'Ach(V)'], ['Illum signal time shift (s)', float, '0.'], ['Illum Threshold', float, '0.8'], ['Illum Invert', int, '1']]], \
+        ['Ephoto', ['Illum', 'Ewe(V)', 'I(A)', 't(s)'], [['frac of Illum segment start', float, '0.4'], ['frac of Illum segment end', float, '0.95'], ['frac of Dark segment start', float, '0.4'], ['frac of Dark segment end', float, '0.95'], ['Illum signal key', str, 'Ach(V)'], ['Illum signal time shift (s)', float, '0.'], ['Illum Threshold', float, '0.8'], ['Illum Invert', int, '1'], ['num illum cycles', int, '99'], ['0 from beginning, 1 from end', int, '1']]], \
         ]
         
         CAops=[\
         ['Ifin', ['I(A)'], []], \
         ['Iave', ['I(A)', 't(s)'],  [['Interval(s)', float, '2.'], ['Num StdDev outlier', float, '2.'], ['Num Pts in Window', int, '999999'], ['0 from beginning, 1 from end', int, '1']]], \
         ['Iss', ['I(A)'], [['Weight Exponent for NumPts', float, '1.'], ['NumPts test interval', int, '10']]], \
-        ['Iphoto', ['Illum', 'I(A)', 'Ewe(V)', 't(s)'], [['frac of Illum segment start', float, '0.4'], ['frac of Illum segment end', float, '0.95'], ['frac of Dark segment start', float, '0.4'], ['frac of Dark segment end', float, '0.95'], ['Illum signal key', str, 'Ach(V)'], ['Illum signal time shift (s)', float, '0.'], ['Illum Threshold', float, '0.8'], ['Illum Invert', int, '1']]], \
+        ['Iphoto', ['Illum', 'I(A)', 'Ewe(V)', 't(s)'], [['frac of Illum segment start', float, '0.4'], ['frac of Illum segment end', float, '0.95'], ['frac of Dark segment start', float, '0.4'], ['frac of Dark segment end', float, '0.95'], ['Illum signal key', str, 'Ach(V)'], ['Illum signal time shift (s)', float, '0.'], ['Illum Threshold', float, '0.8'], ['Illum Invert', int, '1'], ['num illum cycles', int, '99'], ['0 from beginning, 1 from end', int, '1']]], \
         ]
         
         Bubbleops=[\
@@ -814,17 +814,26 @@ class echemvisDialog(QDialog):
                 newikey='IllumMod'
                 techdict[newikey]=-1*techdict[ikey]
                 ikey=newikey
-
+            
             err=calcdiff_ill_caller(techdict, ikey=ikey, thresh=self.CalcParams[6], ykeys=[self.calckeys[1]], xkeys=list(self.calckeys[2:]), illfracrange=(self.CalcParams[0], self.CalcParams[1]), darkfracrange=(self.CalcParams[2], self.CalcParams[3]))
             if err:
                 return 0.
             self.plotillumkey='IllumBool'
-            if 'min' in fcnnam:
-                returnval=min(techdict[self.calckeys[1]+'_illdiff'])
-            elif 'max' in fcnnam:
-                returnval=max(techdict[self.calckeys[1]+'_illdiff'])
+            
+            ncycs=self.CalcParams[8]
+            fromend=self.CalcParams[9]
+            if fromend:
+                arr=techdict[self.calckeys[1]+'_illdiff'][::-1]
             else:
-                returnval=techdict[self.calckeys[1]+'_illdiffmean']
+                arr=techdict[self.calckeys[1]+'_illdiff']
+            arr=arr[:ncycs]
+            
+            if 'min' in fcnnam:
+                returnval=min(arr)
+            elif 'max' in fcnnam:
+                returnval=max(arr)
+            else:
+                returnval=numpy.mean(arr)
             
         else:
             print 'FOM function not understood'
