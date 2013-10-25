@@ -419,8 +419,8 @@ class echemvisDialog(QDialog):
 #        self.echem30.show()
         self.plotillumkey=None
         
-		#Comment out next line to disable db access
-        folderpath=PyCodePath
+		#Uncomment out next line to disable db access
+        #folderpath=PyCodePath
         if folderpath is None:
             self.dbdatasource=userinputcaller(self, inputs=[('DBsource?', bool, '1')], title='Change to 0 to read for local harddrive.')[0]
             if self.dbdatasource:
