@@ -419,7 +419,7 @@ class echemvisDialog(QDialog):
 #        self.echem30.show()
         self.plotillumkey=None
         
-        #Remove next line to enable DB
+		#Comment out next line to disable db access
         folderpath=PyCodePath
         if folderpath is None:
             self.dbdatasource=userinputcaller(self, inputs=[('DBsource?', bool, '1')], title='Change to 0 to read for local harddrive.')[0]
@@ -923,26 +923,29 @@ class echemvisDialog(QDialog):
                 techdict[newikey]=-1*techdict[ikey]
                 ikey=newikey
             
+            illkey=self.calckeys[1]+'_illdiff'
             err=calcdiff_ill_caller(techdict, ikey=ikey, thresh=self.CalcParams[6], ykeys=[self.calckeys[1]], xkeys=list(self.calckeys[2:]), illfracrange=(self.CalcParams[0], self.CalcParams[1]), darkfracrange=(self.CalcParams[2], self.CalcParams[3]))
-            if err:
-                return 0.
-            self.plotillumkey='IllumBool'
-            
-            ncycs=self.CalcParams[8]
-            fromend=self.CalcParams[9]
-            if fromend:
-                arr=techdict[self.calckeys[1]+'_illdiff'][::-1]
-            else:
-                arr=techdict[self.calckeys[1]+'_illdiff']
-            arr=arr[:ncycs]
-            
-            if 'min' in fcnnam:
-                returnval=min(arr)
-            elif 'max' in fcnnam:
-                returnval=max(arr)
-            else:
-                returnval=numpy.mean(arr)
-            
+            try:
+				if err or len(techdict[illkey])==0:
+					return 0
+				self.plotillumkey='IllumBool'
+				
+				ncycs=self.CalcParams[8]
+				fromend=self.CalcParams[9]
+				if fromend:
+					arr=techdict[illkey][::-1]
+				else:
+					arr=techdict[illkey]
+				arr=arr[:ncycs]
+				
+				if 'min' in fcnnam:
+					returnval=min(arr)
+				elif 'max' in fcnnam:
+					returnval=max(arr)
+				else:
+					returnval=numpy.mean(arr)
+            except:
+				return 0
         else:
             print 'FOM function not understood'
             return 0.
