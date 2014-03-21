@@ -10,28 +10,28 @@ from echem_plate_math import *
 
 
 
-SYSTEM=9
+SYSTEM=0
 if SYSTEM==0:
-    homepath='C:/Users/Gregoire/Documents/CaltechWork/echemdrop/DropEchem_Aug28_Sep14_2012'
-    filterstr='2012-9_FeCoNiTi500'
+    homepath='/media/work/SDC/FOM analysis/data/'
+    filterstr=''
 if SYSTEM==1:
-    homepath='C:/Users/Gregoire/Documents/CaltechWork/echemdrop/201210'
+    homepath='/media/work/SDC/20131029 NiMnCoCe_7614'
     filterstr=''
 if SYSTEM==2:
-    homepath='C:/Users/Gregoire/Documents/CaltechWork/echemdrop/20121108NiFeCoAl_F'
+    homepath='/media/work/SDC/20131104 NiSnCoCe_8547'
     filterstr=''
 if SYSTEM==3:
-    homepath='C:/Users/Gregoire/Documents/CaltechWork/echemdrop/20121031NiFeCoAl_P'
+    homepath='/media/work/SDC/20131105 NiZnCoCe_8132'
     filterstr=''
 if SYSTEM==4:    
-    homepath='C:/Users/Gregoire/Documents/CaltechWork/echemdrop/201212_BiVNiFe'
-    filterstr='201212_BiVNiFe'
+    homepath='/media/work/SDC/20131106 NiCuCoCe_8154'
+    filterstr=''
 if SYSTEM==5:
-    homepath='C:/Users/Gregoire/Documents/CaltechWork/echemdrop/NiFeCoCe plates 1M NaOH'
-    filterstr='201304'
+    homepath='/media/work/SDC/20131121 NiLaCoCe_plate_8659'
+    filterstr=''
 if SYSTEM==6:
-    homepath='C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/20130604NiFeCoCe/'
-    filterstr='20130605NiFeCoCe_plate1_CP_6220'
+    homepath='/media/work/SDC/20131202 NiYCoCe_plate_8693'
+    filterstr=''
 if SYSTEM==7:
     homepath='C:/Users/Public/Documents/EchemDropRawData/NiFeCoCe/20130604NiFeCoCe/'
     filterstr='2013060607NiFeCoCe_plate1_CP3_6220'
@@ -63,7 +63,7 @@ def processplate(datafolder, savefolder, expmntindex=3, expmntstring='CV2', calc
         echemvis.writefile(p=savefolder, savedlist=savedlist)
 
 
-
+##Batch process each subdirectory in "homepath"
 for fn in os.listdir(homepath):
     p=os.path.join(homepath, fn)
     if os.path.isdir(p) and filterstr in fn:
@@ -73,6 +73,7 @@ for fn in os.listdir(homepath):
         sf=os.path.join(homepath,'results')
         if not os.path.isdir(sf):
             os.mkdir(sf)
+            print(sf)
 #        #CV2 and CV5
 #        echemvis.expmntComboBox.setCurrentIndex(3)
 #        for s in ['CV2', 'CV5']:
@@ -92,13 +93,13 @@ for fn in os.listdir(homepath):
 #                processplate(p, sf, expmntindex=1, expmntstring=s, calcoptionindex=2, CalcParams=[1., 10.])
 
 #        #CP1 and CP4 Efin
-#        echemvis.expmntComboBox.setCurrentIndex(1)
-#        for s in ['CP1']:#, 'CP4']:
-#            echemvis.expmntLineEdit.setText(s)
-#            echemvis.get_techniquedictlist(nfiles=10)
-#            if len(echemvis.techniquedictlist)>8:
-#                print s
-#                processplate(p, sf, expmntindex=1, expmntstring=s, calcoptionindex=0)
+        echemvis.expmntComboBox.setCurrentIndex(1)
+        for s in ['CP1']:#, 'CP4']:
+            echemvis.expmntLineEdit.setText(s)
+            echemvis.get_techniquedictlist(nfiles=9999)
+            if len(echemvis.techniquedictlist)>8:
+                print s
+                processplate(p, sf, expmntindex=1, expmntstring=s, calcoptionindex=0)
                 
 #        #CP1 and CP4 Ethresh
 #        for s in ['CV2', 'CV5']:
@@ -135,11 +136,11 @@ for fn in os.listdir(homepath):
 #        break
 
         #CPs Eave 20pts
-        echemvis.expmntComboBox.setCurrentIndex(1)
-        for s in ['CP4', 'CP5', 'CP6']:#
-            echemvis.expmntLineEdit.setText(s)
-            echemvis.get_techniquedictlist(nfiles=9999)
-            print len(echemvis.techniquedictlist)
-            if len(echemvis.techniquedictlist)>8:
-                print s
-                processplate(p, sf, expmntindex=1, expmntstring=s, calcoptionindex=1, CalcParams=[1, 2, 20, 1], savedlist=True)
+#        echemvis.expmntComboBox.setCurrentIndex(1)
+#        for s in ['CP4', 'CP5', 'CP6']:#
+#            echemvis.expmntLineEdit.setText(s)
+#            echemvis.get_techniquedictlist(nfiles=9999)
+#            print len(echemvis.techniquedictlist)
+#            if len(echemvis.techniquedictlist)>8:
+#                print s
+#                processplate(p, sf, expmntindex=1, expmntstring=s, calcoptionindex=1, CalcParams=[1, 2, 20, 1], savedlist=True)

@@ -260,7 +260,7 @@ class MainMenu(QMainWindow):
         self.echem=echemvisDialog(self, **kwargs)
         if execute:
             self.echem.exec_()
-        if self.echem.dbdatasource:
+        if self.echem.dbdatasource is 1:
             try:
                 self.echem.dbc.db.close()
             except:
@@ -422,10 +422,23 @@ class echemvisDialog(QDialog):
 		#Uncomment out next line to disable db access
         #folderpath=PyCodePath
         if folderpath is None:
-            self.dbdatasource=userinputcaller(self, inputs=[('DBsource?', bool, '1')], title='Change to 0 to read for local harddrive.')[0]
-            if self.dbdatasource:
+            self.dbdatasource=userinputcaller(self, inputs=[('DBsource?', int, '1')], title='Change to 0 to read for local harddrive.')[0]
+            if self.dbdatasource is 1:
                 self.dbc=None#self.createdbsession()
-                
+            if self.dbdatasource is 2:
+                if sys.platform.startswith('linux'):
+                    self.kcomputers='/media/hteshare/computers'
+                    self.kexperiments='/media/hteshare/experiments'
+                if sys.platform.startswith('win'):
+                    self.kcomputers='K:\\computers'
+                    self.kexperiments='K:\\experiments'
+                if sys.platform.startswith('darwin'):
+                    self.kcomputers='/Volumes/HTEshare/home/computers'
+                    self.kexperiments='/Volumes/HTEshare/home/experiments'
+            if self.dbdatasource is 0:
+                self.kcomputers="%s" % os.getcwd()
+                self.kexperiments="%s" % os.getcwd()
+            print 'kcomputers is ' + self.kcomputers
         else:
             self.dbdatasource=0
 
@@ -481,8 +494,8 @@ class echemvisDialog(QDialog):
         ['E_Ithresh', ['I(A)','Ewe(V)'], [['Ithresh(A)', float, '1e-5'], ['Num consec points', int, '20'], ['0 for below, 1 for above', int, '1'], ['Thresh not reached value', float, '1']]], \
         ['Eh in I=Io Exp(E/Eh)', ['I(A)', 'Ewe(V)'], []], \
         ['Io in I=Io Exp(E/Eh)', ['I(A)', 'Ewe(V)'], []], \
-        ['Iphoto_max', ['Illum', 'I(A)', 'Ewe(V)', 't(s)'], [['frac of Illum segment start', float, '0.4'], ['frac of Illum segment end', float, '0.95'], ['frac of Dark segment start', float, '0.4'], ['frac of Dark segment end', float, '0.95'], ['Illum signal key', str, 'Ach(V)'], ['Illum signal time shift (s)', float, '0.'], ['Illum Threshold', float, '0.8'], ['Illum Invert', int, '1'], ['num illum cycles', int, '99'], ['0 from beginning, 1 from end', int, '1']]], \
-        ['Iphoto_min', ['Illum', 'I(A)', 'Ewe(V)', 't(s)'], [['frac of Illum segment start', float, '0.4'], ['frac of Illum segment end', float, '0.95'], ['frac of Dark segment start', float, '0.4'], ['frac of Dark segment end', float, '0.95'], ['Illum signal key', str, 'Ach(V)'], ['Illum signal time shift (s)', float, '0.'], ['Illum Threshold', float, '0.8'], ['Illum Invert', int, '1'], ['num illum cycles', int, '99'], ['0 from beginning, 1 from end', int, '1']]], \
+        ['Iphoto_max', ['Illum', 'I(A)', 'Ewe(V)', 't(s)'], [['frac of Illum segment start', float, '0.4'], ['frac of Illum segment end', float, '0.95'], ['frac of Dark segment start', float, '0.4'], ['frac of Dark segment end', float, '0.95'], ['Illum signal key', str, 'Toggle'], ['Illum signal time shift (s)', float, '0.'], ['Illum Threshold', float, '0.5'], ['Illum Invert', int, '0'], ['num illum cycles', int, '2'], ['0 from beginning, 1 from end', int, '1']]], \
+        ['Iphoto_min', ['Illum', 'I(A)', 'Ewe(V)', 't(s)'], [['frac of Illum segment start', float, '0.4'], ['frac of Illum segment end', float, '0.95'], ['frac of Dark segment start', float, '0.4'], ['frac of Dark segment end', float, '0.95'], ['Illum signal key', str, 'Toggle'], ['Illum signal time shift (s)', float, '0.'], ['Illum Threshold', float, '0.5'], ['Illum Invert', int, '0'], ['num illum cycles', int, '2'], ['0 from beginning, 1 from end', int, '1']]], \
         ['None', ['I(A)', 'Ewe(V)'], []], \
         ]
         
@@ -490,21 +503,21 @@ class echemvisDialog(QDialog):
         ['Efin', ['Ewe(V)'], []], \
         ['Eave', ['Ewe(V)', 't(s)'], [['Interval(s)', float, '2.'], ['Num StdDev outlier', float, '2.'], ['Num Pts in Window', int, '999999'], ['0 from beginning, 1 from end', int, '1']]], \
         ['Ess', ['Ewe(V)'], [['Weight Exponent for NumPts', float, '1.'], ['NumPts test interval', int, '10']]], \
-        ['Ephoto', ['Illum', 'Ewe(V)', 'I(A)', 't(s)'], [['frac of Illum segment start', float, '0.4'], ['frac of Illum segment end', float, '0.95'], ['frac of Dark segment start', float, '0.4'], ['frac of Dark segment end', float, '0.95'], ['Illum signal key', str, 'Ach(V)'], ['Illum signal time shift (s)', float, '0.'], ['Illum Threshold', float, '0.8'], ['Illum Invert', int, '1'], ['num illum cycles', int, '99'], ['0 from beginning, 1 from end', int, '1']]], \
+        ['Ephoto', ['Illum', 'Ewe(V)', 'I(A)', 't(s)'], [['frac of Illum segment start', float, '0.4'], ['frac of Illum segment end', float, '0.95'], ['frac of Dark segment start', float, '0.4'], ['frac of Dark segment end', float, '0.95'], ['Illum signal key', str, 'Toggle'], ['Illum signal time shift (s)', float, '0.'], ['Illum Threshold', float, '0.5'], ['Illum Invert', int, '0'], ['num illum cycles', int, '2'], ['0 from beginning, 1 from end', int, '1']]], \
         ]
         
         CPops=[\
         ['Efin', ['Ewe(V)'], []], \
         ['Eave', ['Ewe(V)', 't(s)'],  [['Interval(s)', float, '2.'], ['Num StdDev outlier', float, '2.'], ['Num Pts in Window', int, '999999'], ['0 from beginning, 1 from end', int, '1']]], \
         ['Ess', ['Ewe(V)'], [['Weight Exponent for NumPts', float, '1.'], ['NumPts test interval', int, '10']]], \
-        ['Ephoto', ['Illum', 'Ewe(V)', 'I(A)', 't(s)'], [['frac of Illum segment start', float, '0.4'], ['frac of Illum segment end', float, '0.95'], ['frac of Dark segment start', float, '0.4'], ['frac of Dark segment end', float, '0.95'], ['Illum signal key', str, 'Ach(V)'], ['Illum signal time shift (s)', float, '0.'], ['Illum Threshold', float, '0.8'], ['Illum Invert', int, '1'], ['num illum cycles', int, '99'], ['0 from beginning, 1 from end', int, '1']]], \
+        ['Ephoto', ['Illum', 'Ewe(V)', 'I(A)', 't(s)'], [['frac of Illum segment start', float, '0.4'], ['frac of Illum segment end', float, '0.95'], ['frac of Dark segment start', float, '0.4'], ['frac of Dark segment end', float, '0.95'], ['Illum signal key', str, 'Toggle'], ['Illum signal time shift (s)', float, '0.'], ['Illum Threshold', float, '0.5'], ['Illum Invert', int, '0'], ['num illum cycles', int, '2'], ['0 from beginning, 1 from end', int, '1']]], \
         ]
         
         CAops=[\
         ['Ifin', ['I(A)'], []], \
         ['Iave', ['I(A)', 't(s)'],  [['Interval(s)', float, '2.'], ['Num StdDev outlier', float, '2.'], ['Num Pts in Window', int, '999999'], ['0 from beginning, 1 from end', int, '1']]], \
         ['Iss', ['I(A)'], [['Weight Exponent for NumPts', float, '1.'], ['NumPts test interval', int, '10']]], \
-        ['Iphoto', ['Illum', 'I(A)', 'Ewe(V)', 't(s)'], [['frac of Illum segment start', float, '0.4'], ['frac of Illum segment end', float, '0.95'], ['frac of Dark segment start', float, '0.4'], ['frac of Dark segment end', float, '0.95'], ['Illum signal key', str, 'Ach(V)'], ['Illum signal time shift (s)', float, '0.'], ['Illum Threshold', float, '0.8'], ['Illum Invert', int, '1'], ['num illum cycles', int, '99'], ['0 from beginning, 1 from end', int, '1']]], \
+        ['Iphoto', ['Illum', 'I(A)', 'Ewe(V)', 't(s)'], [['frac of Illum segment start', float, '0.4'], ['frac of Illum segment end', float, '0.95'], ['frac of Dark segment start', float, '0.4'], ['frac of Dark segment end', float, '0.95'], ['Illum signal key', str, 'Toggle'], ['Illum signal time shift (s)', float, '0.'], ['Illum Threshold', float, '0.5'], ['Illum Invert', int, '0'], ['num illum cycles', int, '2'], ['0 from beginning, 1 from end', int, '1']]], \
         ]
         
         Bubbleops=[\
@@ -563,6 +576,7 @@ class echemvisDialog(QDialog):
         plotButton=QPushButton()
         plotButton.setText("update\nfigures")
         QObject.connect(plotButton, SIGNAL("pressed()"), self.calcandplot)
+        QObject.connect(plotButton, SIGNAL("pressed()"), self.writefileauto)
         
         updateButton=QPushButton()
         updateButton.setText("update\ndata")
@@ -648,6 +662,9 @@ class echemvisDialog(QDialog):
         templab.setText('E0=Equil.Pot.(V):')
         self.E0SpinBox=QDoubleSpinBox()
         self.E0SpinBox.setDecimals(3)
+        self.E0SpinBox.setMaximum(10)
+        self.E0SpinBox.setMinimum(-10)
+        self.E0SpinBox.setValue(0)
         E0layout=QHBoxLayout()
         E0layout.addWidget(templab)
         E0layout.addWidget(self.E0SpinBox)
@@ -655,8 +672,8 @@ class echemvisDialog(QDialog):
         templab=QLabel()
         templab.setText('Is=I scaling:')
         self.IsSpinBox=QDoubleSpinBox()
-        self.IsSpinBox.setMaximum(1000.)
-        self.IsSpinBox.setMinimum(-1000.)
+        self.IsSpinBox.setMaximum(10.)
+        self.IsSpinBox.setMinimum(-10.)
         self.IsSpinBox.setValue(1.)
         Islayout=QHBoxLayout()
         Islayout.addWidget(templab)
@@ -777,7 +794,7 @@ class echemvisDialog(QDialog):
         
     def selectfolder(self, plate_id=None, selectexids=None, folder=None):
         self.statusLineEdit.setText('waiting for folder input')
-        if self.dbdatasource:
+        if self.dbdatasource is 1:
             if not self.dbc is None:
                 self.dbc.db.close()
             self.createdbsession()
@@ -806,10 +823,12 @@ class echemvisDialog(QDialog):
                 self.dbrecarrd[k]=v[inds]
         else:
             if folder is None:
-                self.folderpath=mygetdir(self, markstr='containing echem data .txt for single plate')
+                self.folderpath=mygetdir(self, markstr='containing echem data .txt for single plate', xpath=self.kcomputers)
             else:
                 self.folderpath=folder
+            os.chdir(self.kexperiments)
         self.statusLineEdit.setText('idle')
+        self.setWindowTitle(str(os.path.split(self.folderpath)[1]))
         #self.calcandplot()
         
         
@@ -970,7 +989,7 @@ class echemvisDialog(QDialog):
         
         techname=str(self.expmntLineEdit.text())
         
-        if self.dbdatasource:
+        if self.dbdatasource is 1:
             if len(techname)==0 and len(self.techniquedictlist)==0:
                 technamedflt=self.dbrecarrd['technique_name'][0]
                 for i, tup in enumerate(self.expmnt_calc_options):
@@ -1370,9 +1389,8 @@ class echemvisDialog(QDialog):
         if len(ids)==0:
             print 'no data to save'
             return
-
         if p is None:
-            p=mygetsavefile(parent=self, markstr='save spreadsheet string', filename=os.path.split(self.folderpath)[1]+'_'+explab+'.txt' )
+            p=mygetsavefile(parent=self, markstr='save spreadsheet string', filename=os.path.split(self.folderpath)[1]+'_'+explab+'.txt', xpath=self.kexperiments)
         elif os.path.isdir(p):
             p=os.path.join(p, os.path.split(self.folderpath)[1]+'_'+explab+'.txt')
             print p
@@ -1397,10 +1415,51 @@ class echemvisDialog(QDialog):
         if explab is None:
             explab=''.join((str(self.expmntLineEdit.text()), str(self.calcoptionComboBox.currentText())))
         if p is None:
-            p=mygetsavefile(parent=self, markstr='save spreadsheet string', filename=os.path.split(self.folderpath)[1]+'_'+explab+'.txt' )
+            p=mygetsavefile(parent=self, markstr='save spreadsheet string', filename=os.path.split(self.folderpath)[1]+'_'+explab+'.txt', xpath=self.kexperiments)
         elif os.path.isdir(p):
             p=os.path.join(p, os.path.split(self.folderpath)[1]+'_'+explab+'.txt')
             print p
+        if not p:
+            print 'save aborted'
+            return
+            
+        labels=['Sample', 'x(mm)', 'y(mm)']
+        labels+=self.techniquedictlist[0]['elements']
+        labels+=[explab]
+        kv_fmt=[('Sample', '%d'), ('x', '%.2f'), ('y', '%.2f'), ('compositions', '%.4f'), ('FOM', '%.6e')]
+        arr=[]
+        for d in self.techniquedictlist:
+            arr2=[]
+            for k, fmt in kv_fmt:
+                v=d[k]
+                if isinstance(v, numpy.ndarray) or isinstance(v, list):
+                    for subv in v:
+                        arr2+=[fmt %subv]
+                else:
+                    arr2+=[fmt %v]
+            arr+=['\t'.join(arr2)]
+        s='\t'.join(labels)+'\n'
+        s+='\n'.join(arr)
+        
+        f=open(p, mode='w')
+        f.write(s)
+        f.close()
+        
+        if savedlist:
+            f=open(p[:-4]+'_dlist.pck', mode='w')
+            pickle.dump(self.techniquedictlist, f)
+            f.close()
+        
+        self.statusLineEdit.setText('idle')
+
+    def writefileauto(self, p=None, explab=None, savedlist=False):
+        self.statusLineEdit.setText('writing file')
+        if len(self.techniquedictlist)==0:
+            print 'no data to save'
+            return
+        if explab is None:
+            explab=''.join((str(self.expmntLineEdit.text()), str(self.calcoptionComboBox.currentText())))
+        p=os.path.join(p, os.path.split(self.folderpath)[1]+'_'+explab+'.txt')
         if not p:
             print 'save aborted'
             return
