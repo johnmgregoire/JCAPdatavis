@@ -425,17 +425,17 @@ class echemvisDialog(QDialog):
             self.dbdatasource=userinputcaller(self, inputs=[('DBsource?', int, '1')], title='Change to 0 to read for local harddrive.')[0]
             if self.dbdatasource is 1:
                 self.dbc=None#self.createdbsession()
-            if self.dbdatasource is 2:
+            elif self.dbdatasource is 2:
                 if sys.platform.startswith('linux'):
                     self.kcomputers='/media/hteshare/computers'
                     self.kexperiments='/media/hteshare/experiments'
-                if sys.platform.startswith('win'):
+                elif sys.platform.startswith('win'):
                     self.kcomputers='K:\\computers'
                     self.kexperiments='K:\\experiments'
-                if sys.platform.startswith('darwin'):
+                elif sys.platform.startswith('darwin'):
                     self.kcomputers='/Volumes/HTEshare/home/computers'
                     self.kexperiments='/Volumes/HTEshare/home/experiments'
-            if self.dbdatasource is 0:
+            else:
                 self.kcomputers="%s" % os.getcwd()
                 self.kexperiments="%s" % os.getcwd()
             print 'kcomputers is ' + self.kcomputers
@@ -1459,11 +1459,25 @@ class echemvisDialog(QDialog):
             return
         if explab is None:
             explab=''.join((str(self.expmntLineEdit.text()), str(self.calcoptionComboBox.currentText())))
+        
+        #try to get plate id from folder name; if successful (finds a string of digits) and dbdatasource=2, create folder in K: experiments; works on *nix and Windows, untested on OSX
+        idfromfolder=os.path.split(self.folderpath)[1].rsplit('_',1)[1].split(' ',1)[0]
+        exptypes=('eche', 'ecqe')
+        if idfromfolder.isdigit():
+            if self.dbdatasource is 2:
+                for exp in exptypes:
+                    if exp in self.folderpath:
+                        fompath=os.path.join(self.kexperiments, exp, idfromfolder)
+                        try:
+                            os.mkdir(fompath)
+                        except:
+                            pass
+                        p=fompath
+
         p=os.path.join(p, os.path.split(self.folderpath)[1]+'_'+explab+'.txt')
         if not p:
             print 'save aborted'
             return
-            
         labels=['Sample', 'x(mm)', 'y(mm)']
         labels+=self.techniquedictlist[0]['elements']
         labels+=[explab]
