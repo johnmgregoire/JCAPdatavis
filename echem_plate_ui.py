@@ -1480,7 +1480,7 @@ class echemvisDialog(QDialog):
             if self.dbdatasource is 2:
                 for exp in exptypes:
                     if exp in self.folderpath:
-                        fompath=os.path.join(self.kexperiments, exp, idfromfolder)
+                        fompath=os.path.join(self.kexperiments, exp, 'fom_data', idfromfolder)
                         try:
                             os.mkdir(fompath)
                         except:
