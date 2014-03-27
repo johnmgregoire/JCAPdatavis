@@ -576,7 +576,7 @@ class echemvisDialog(QDialog):
         plotButton=QPushButton()
         plotButton.setText("update\nfigures")
         QObject.connect(plotButton, SIGNAL("pressed()"), self.calcandplot)
-        QObject.connect(plotButton, SIGNAL("pressed()"), self.writefileauto)
+        #QObject.connect(plotButton, SIGNAL("pressed()"), self.writefileauto)
         
         updateButton=QPushButton()
         updateButton.setText("update\ndata")
@@ -584,7 +584,7 @@ class echemvisDialog(QDialog):
         
         saveButton=QPushButton()
         saveButton.setText("save FOM\nspreadhseet")
-        QObject.connect(saveButton, SIGNAL("pressed()"), self.writefile)
+        QObject.connect(saveButton, SIGNAL("pressed()"), self.writefomfile_txt)
         
         savesampleButton=QPushButton()
         savesampleButton.setText("save select\nsample IDs")
@@ -630,6 +630,14 @@ class echemvisDialog(QDialog):
         
         self.statusLineEdit=QLineEdit()
         self.statusLineEdit.setReadOnly(True)
+        
+        self.measdescLineEdit=QLineEdit()
+        templab=QLabel()
+        templab.setText('Meas. Desc. for csv')
+    
+        measdescLayout=QVBoxLayout()
+        measdescLayout.addWidget(templab)
+        measdescLayout.addWidget(self.measdescLineEdit)
         
         templab=QLabel()
         templab.setText('DAQ time')
@@ -744,7 +752,8 @@ class echemvisDialog(QDialog):
         ctrllayout.addLayout(vminmaxlayout, i+2, 1)
         ctrllayout.addLayout(outrangecollayout, i+2, 2)
         
-        ctrllayout.addWidget(self.statusLineEdit, i+3, 0)
+        #ctrllayout.addWidget(self.statusLineEdit, i+3, 0)
+        ctrllayout.addLayout(measdescLayout, i+3, 0)
         ctrllayout.addWidget(self.overlayselectCheckBox, i+3, 1)
         ctrllayout.addLayout(legendlayout, i+3, 2)
         
@@ -1086,6 +1095,7 @@ class echemvisDialog(QDialog):
             self.ternskipComboBox.setCurrentIndex(i0)
         self.statusLineEdit.setText('idle')
         self.plot()
+        self.writefileauto()#writes files if dbdatasource==2, which means source is on K:
         
 
     def plot(self):
@@ -1407,7 +1417,7 @@ class echemvisDialog(QDialog):
         
         self.statusLineEdit.setText('idle')
         
-    def writefile(self, p=None, explab=None, savedlist=False):
+    def writefomfile_txt(self, p=None, explab=None, savedlist=False):
         self.statusLineEdit.setText('writing file')
         if len(self.techniquedictlist)==0:
             print 'no data to save'
@@ -1451,11 +1461,58 @@ class echemvisDialog(QDialog):
             f.close()
         
         self.statusLineEdit.setText('idle')
-
-    def writefileauto(self, p=None, explab=None, savedlist=False):
+    def writefomfile_csv(self, p=None, explab=None, savedlist=False):
         self.statusLineEdit.setText('writing file')
         if len(self.techniquedictlist)==0:
             print 'no data to save'
+            return
+        if explab is None:
+            explab=''.join((str(self.expmntLineEdit.text()), str(self.calcoptionComboBox.currentText())))
+        if p is None:
+            p=mygetsavefile(parent=self, markstr='save spreadsheet string', filename=os.path.split(self.folderpath)[1]+'_'+explab+'.txt', xpath=self.kexperiments)
+        elif os.path.isdir(p):
+            p=os.path.join(p, os.path.split(self.folderpath)[1]+'_'+explab+'.txt')
+            print p
+        if not p:
+            print 'save aborted'
+            return
+            
+        labels=['saqmple_no']
+        labels+=[explab]
+        kv_fmt=[('Sample', '%d'), ('FOM', '%.5e')]
+        arr=[]
+        for d in self.techniquedictlist:
+            arr2=[]
+            for k, fmt in kv_fmt:
+                v=d[k]
+                if isinstance(v, numpy.ndarray) or isinstance(v, list):
+                    for subv in v:
+                        arr2+=[fmt %subv]
+                else:
+                    arr2+=[fmt %v]
+            arr+=[','.join(arr2)]
+        s=','.join(labels)+'\n'
+        s+='\n'.join(arr)
+        s=s.replace('nan', 'NaN')
+        
+        desc=str(self.measdescLineEdit.text()).strip().replace('"', '')
+        if len(desc)>0:
+            s='#description = "'+desc+'"\n'+s
+        
+        f=open(p, mode='w')
+        f.write(s)
+        f.close()
+        
+        if savedlist:
+            f=open(p[:-4]+'_dlist.pck', mode='w')
+            pickle.dump(self.techniquedictlist, f)
+            f.close()
+        
+        self.statusLineEdit.setText('idle')
+    def writefileauto(self, folder=None, explab=None):
+        self.statusLineEdit.setText('writing file')
+        if len(self.techniquedictlist)==0:
+            print 'abort autosave - no data to save'
             return
         if explab is None:
             explab=''.join((str(self.expmntLineEdit.text()), str(self.calcoptionComboBox.currentText())))
@@ -1476,48 +1533,44 @@ class echemvisDialog(QDialog):
             else:
                 idsuffices=[folderstrings[-i-1]]+idsuffices
         exptypes=('eche', 'ecqe')
-        if not idfromfolder is None:
-            if self.dbdatasource is 2:
-                for exp in exptypes:
-                    if exp in self.folderpath:
-                        fompath=os.path.join(self.kexperiments, exp, 'fom_data', idfromfolder)
-                        try:
-                            os.mkdir(fompath)
-                        except:
-                            pass
-                        p=fompath
-        p=os.path.join(p, os.path.split(self.folderpath)[1]+'_'+explab+'.txt')
-        if not p:
-            print 'save aborted'
+        if idfromfolder is None:
+            print 'cannot autosave due to lack of serial number'
             return
-        labels=['Sample', 'x(mm)', 'y(mm)']
-        labels+=self.techniquedictlist[0]['elements']
-        labels+=[explab]
-        kv_fmt=[('Sample', '%d'), ('x', '%.2f'), ('y', '%.2f'), ('compositions', '%.4f'), ('FOM', '%.6e')]
-        arr=[]
-        for d in self.techniquedictlist:
-            arr2=[]
-            for k, fmt in kv_fmt:
-                v=d[k]
-                if isinstance(v, numpy.ndarray) or isinstance(v, list):
-                    for subv in v:
-                        arr2+=[fmt %subv]
-                else:
-                    arr2+=[fmt %v]
-            arr+=['\t'.join(arr2)]
-        s='\t'.join(labels)+'\n'
-        s+='\n'.join(arr)
+        if not folder is None:
+            txtfolder=folder
+            csvfolder=folder
+        elif self.dbdatasource is 2:
+            for exp in exptypes:
+                if exp in self.folderpath:
+                    txtfolder=os.path.join(self.kexperiments, exp, 'fom_data', idfromfolder)
+                    csvfolder=os.path.join(self.kexperiments, exp, 'csv')
+                    break
+        else:
+            return
         
-        f=open(p, mode='w')
-        f.write(s)
-        f.close()
+        if not os.path.isdir(txtfolder):
+            try:
+                os.mkdir(txtfolder)
+            except:
+                print 'cannot autosave because unable to make directory ', txtfolder
+                txtfolder=None                            
+        if not txtfolder is None:
+            txtp=os.path.join(txtfolder, os.path.split(self.folderpath)[1]+'_'+explab+'.txt')
+            print 'autosaving ', txtp
+            self.writefomfile_txt(p=txtp, explab=explab, savedlist=False)
         
-        if savedlist:
-            f=open(p[:-4]+'_dlist.pck', mode='w')
-            pickle.dump(self.techniquedictlist, f)
-            f.close()
+        if not os.path.isdir(csvfolder):
+            try:
+                os.mkdir(csvfolder)
+            except:
+                print 'cannot autosave because unable to make directory ', csvfolder
+                csvfolder=None                            
+        if not csvfolder is None:
+            csvp=os.path.join(csvfolder, idfromfolder+'-'+explab+'-EcVisAuto.csv')
+            print 'autosaving ', csvp
+            self.writefomfile_csv(p=csvp, explab=explab, savedlist=False)
+            
         
-        self.statusLineEdit.setText('idle')
 
 class messageDialog(QDialog):
     def __init__(self, parent=None, title=''):
