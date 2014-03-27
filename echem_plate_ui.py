@@ -1461,9 +1461,22 @@ class echemvisDialog(QDialog):
             explab=''.join((str(self.expmntLineEdit.text()), str(self.calcoptionComboBox.currentText())))
         
         #try to get plate id from folder name; if successful (finds a string of digits) and dbdatasource=2, create folder in K: experiments; works on *nix and Windows, untested on OSX
-        idfromfolder=os.path.split(self.folderpath)[1].rsplit('_',1)[1].split(' ',1)[0]
+        #idfromfolder=os.path.split(self.folderpath)[1].rsplit('_',1)[1].split(' ',1)[0]
+        folderstrings=os.path.split(self.folderpath)[1].split('_')
+        idfromfolder=None
+        idsuffices=[]
+        for i in range(len(folderstrings)):
+            fs=folderstrings[-i-1].split(' ')[0]
+            if fs.isdigit():
+                fslist=map(int, list(fs))
+                checksum=sum(fslist[0:len(fslist)-1]) % 10 is fslist[-1]
+                if checksum:
+                    idfromfolder=' '.join([folderstrings[-i-1]]+idsuffices)
+                    break
+            else:
+                idsuffices=[folderstrings[-i-1]]+idsuffices
         exptypes=('eche', 'ecqe')
-        if idfromfolder.isdigit():
+        if not idfromfolder is None:
             if self.dbdatasource is 2:
                 for exp in exptypes:
                     if exp in self.folderpath:
@@ -1473,7 +1486,6 @@ class echemvisDialog(QDialog):
                         except:
                             pass
                         p=fompath
-
         p=os.path.join(p, os.path.split(self.folderpath)[1]+'_'+explab+'.txt')
         if not p:
             print 'save aborted'
