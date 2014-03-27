@@ -1477,7 +1477,7 @@ class echemvisDialog(QDialog):
             print 'save aborted'
             return
             
-        labels=['saqmple_no']
+        labels=['sample_no']
         labels+=[explab]
         kv_fmt=[('Sample', '%d'), ('FOM', '%.5e')]
         arr=[]
