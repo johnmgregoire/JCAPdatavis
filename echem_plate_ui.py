@@ -433,8 +433,8 @@ class echemvisDialog(QDialog):
                     self.kcomputers='K:\\computers'
                     self.kexperiments='K:\\experiments'
                 elif sys.platform.startswith('darwin'):
-                    self.kcomputers='/Volumes/HTEshare/home/computers'
-                    self.kexperiments='/Volumes/HTEshare/home/experiments'
+                    self.kcomputers='/Volumes/home/computers'
+                    self.kexperiments='/Volumes/home/experiments'
             else:
                 self.kcomputers="%s" % os.getcwd()
                 self.kexperiments="%s" % os.getcwd()
