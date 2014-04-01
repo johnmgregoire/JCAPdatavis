@@ -837,7 +837,6 @@ class echemvisDialog(QDialog):
                 self.folderpath=folder
             os.chdir(self.kexperiments)
         self.statusLineEdit.setText('idle')
-        self.setWindowTitle(str(os.path.split(self.folderpath)[1]))
         #self.calcandplot()
         
         
@@ -1093,6 +1092,7 @@ class echemvisDialog(QDialog):
             for i, l in enumerate(self.techniquedictlist[0]['elements']):
                 self.ternskipComboBox.insertItem(i, l)
             self.ternskipComboBox.setCurrentIndex(i0)
+        self.setWindowTitle(str(os.path.split(self.folderpath)[1]))
         self.statusLineEdit.setText('idle')
         self.plot()
         self.writefileauto()#writes files if dbdatasource==2, which means source is on K:
