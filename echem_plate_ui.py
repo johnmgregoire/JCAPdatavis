@@ -22,6 +22,7 @@ PyCodePath=os.path.split(os.path.split(os.path.realpath(__file__))[0])[0]
 
 from matplotlib.ticker import FuncFormatter
 from matplotlib.ticker import ScalarFormatter
+
 def myexpformat_4digs(x, pos):
     return '%.3e' %x
 #    for ndigs in range(4):
@@ -419,7 +420,7 @@ class echemvisDialog(QDialog):
 #        self.echem30.show()
         self.plotillumkey=None
         
-		#Uncomment out next line to disable db access
+        #Uncomment out next line to disable db access
         #folderpath=PyCodePath
         if folderpath is None:
             self.dbdatasource=userinputcaller(self, inputs=[('DBsource?', int, '1')], title='Change to 0 to read for local harddrive.')[0]
@@ -429,6 +430,7 @@ class echemvisDialog(QDialog):
                 if sys.platform.startswith('linux'):
                     self.kcomputers='/media/hteshare/computers'
                     self.kexperiments='/media/hteshare/experiments'
+                    matplotlib.rcParams['font.family']='Bitstream Vera Sans'
                 elif sys.platform.startswith('win'):
                     self.kcomputers='K:\\computers'
                     self.kexperiments='K:\\experiments'
@@ -438,7 +440,10 @@ class echemvisDialog(QDialog):
             else:
                 self.kcomputers="%s" % os.getcwd()
                 self.kexperiments="%s" % os.getcwd()
-            print 'kcomputers is ' + self.kcomputers
+            try:
+                print 'kcomputers is ' + self.kcomputers
+            except:
+                pass
         else:
             self.dbdatasource=0
 
