@@ -1326,7 +1326,7 @@ class echemvisDialog(QDialog):
         if len(legtext)>0:
             legloc=myeval(legtext)
             if isinstance(legloc, int) and legloc>=0:
-                self.plotw_select.axes.legend(loc=legloc)
+                self.plotw_select.axes.legend(loc=legloc).draggable()
         self.plotw_select.fig.canvas.draw()
         t=d['mtime']-2082844800.
         print '^^^^^^^^', t
