@@ -1541,6 +1541,9 @@ class echemvisDialog(QDialog):
         if idfromfolder is None:
             print 'cannot autosave due to lack of serial number'
             return
+        if self.measdescLineEdit.text().isEmpty():
+            print 'cannot autosave due to lack of description'
+            return
         if not folder is None:
             txtfolder=folder
             csvfolder=folder
