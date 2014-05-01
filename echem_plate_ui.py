@@ -23,6 +23,8 @@ PyCodePath=os.path.split(os.path.split(os.path.realpath(__file__))[0])[0]
 from matplotlib.ticker import FuncFormatter
 from matplotlib.ticker import ScalarFormatter
 
+matplotlib.rcParams['backend.qt4'] = 'PyQt4'
+
 def myexpformat_4digs(x, pos):
     return '%.3e' %x
 #    for ndigs in range(4):
@@ -72,12 +74,20 @@ from quaternary_FOM_stackedtern30 import *
 from quaternary_FOM_bintern import *
 
 sys.path.append(os.path.join(PyCodePath,'JCAPPyDBComm'))
-from mysql_dbcommlib import *
+try:
+    from mysql_dbcommlib import *
+except:
+    print 'JCAPPyDBComm not found, do not use option 0'
+    pass
 
 sys.path.append(os.path.join(PyCodePath, 'PythonCodeSecureFiles'))
-from paths import *
-if os.path.isdir(EchemSavePath):
-    os.chdir(EchemSavePath)
+try:
+    from paths import *
+    if os.path.isdir(EchemSavePath):
+        os.chdir(EchemSavePath)
+except:
+    print 'PythonCompositionPlots not found'
+    pass
 
 
     
