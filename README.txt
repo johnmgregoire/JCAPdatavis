@@ -20,6 +20,8 @@ The default Anaconda (Python 2.7) install contains all but two module dependenci
 	PyQt4
 	https://pypi.python.org/pypi/PyQt4
 
+**Anaconda's default Qt4 backend must be changed from 'PySide' to 'PyQt4' in matplotlibrc.
+http://matplotlib.org/1.3.1/users/customizing.html
 
 Linux, OSX, and Windows installers for Anaconda are available here:
 	
