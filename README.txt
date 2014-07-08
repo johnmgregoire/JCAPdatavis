@@ -26,3 +26,7 @@ http://matplotlib.org/1.3.1/users/customizing.html
 Linux, OSX, and Windows installers for Anaconda are available here:
 	
 	http://continuum.io/downloads
+
+Great resource for unofficial windows binaries such as MySQL-python:
+
+	http://www.lfd.uci.edu/~gohlke/pythonlibs/
