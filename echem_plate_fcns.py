@@ -42,6 +42,11 @@ def readechemtxtold(path):
                     val=[attemptnumericconversion(v) for v in val]
                     try:
                         val=numpy.float32(val)
+                        print val
+                        if numpy.any(numpy.isnan(val)):
+                            val=numpy.ones(len(val), dtype='float32')/len(val)
+                        print val
+                        break
                     except:
                         pass
             elif a=='x' or a=='y':
@@ -88,7 +93,10 @@ def readechemtxt(path, mtime_path_fcn=None):
                     val=[attemptnumericconversion(v) for v in val]
                     try:
                         val=numpy.float32(val)
+                        if numpy.any(numpy.isnan(val)):
+                            raise
                     except:
+                        val=numpy.ones(len(val), dtype='float32')/len(val)
                         pass
             elif a=='x' or a=='y':
                 val=attemptnumericconversion(c.replace('mm', '').strip())

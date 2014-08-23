@@ -1207,6 +1207,12 @@ class echemvisDialog(QDialog):
             extend='neither'
         print 'extend ', extend
         m=self.plotw_plate.axes.scatter(x, y, c=fom, s=s, marker='s', cmap=cmap, norm=norm)
+        if x.max()-x.min()<2. or y.max()-y.min()<2.:
+            self.plotw_plate.axes.set_xlim(x.min()-1, x.max()+1)
+            self.plotw_plate.axes.set_ylim(y.min()-1, y.max()+1)
+        else:
+            self.plotw_plate.axes.set_aspect(1.)
+        
         cb=self.plotw_plate.fig.colorbar(m, cax=self.cbax_plate, extend=extend, format=autocolorbarformat((fom.min(), fom.max())))
         #cb.set_label('|Q| (1/nm)')
         
