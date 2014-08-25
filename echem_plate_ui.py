@@ -1032,7 +1032,7 @@ class echemvisDialog(QDialog):
             updateexcludebool=True
             
             dlist=[(p in existpaths and (self.techniquedictlist[existpaths.index(p)],) or (readechemtxt(p, mtime_path_fcn=self.getepoch_path),))[0] for p in pathstoread[:nfiles]]
-
+            dlist=[d for d in dlist if d]#get rid of emtpy dictionaries
         else:
             fns=os.listdir(self.folderpath)
             if len(techname)==0 and len(self.techniquedictlist)==0:
@@ -1054,6 +1054,8 @@ class echemvisDialog(QDialog):
                     updateexcludebool=False
                 else:
                     d=readechemtxt(p)
+                    if not d:
+                        continue
                     d['path']=p
                     d['mtime']=mtime
                     dlist+=[d]

@@ -105,6 +105,8 @@ def readechemtxt(path, mtime_path_fcn=None):
             d[a]=val
         else:
             break
+    if len(lines[count:])==0:
+        return {}
     try:
         z=[map(float, l.strip().replace('\\t', '\t').split('\t')) for l in lines[count:] if len(l.strip())>0]
     except:
