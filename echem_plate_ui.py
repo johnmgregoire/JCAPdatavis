@@ -605,6 +605,18 @@ class echemvisDialog(QDialog):
         savesampleButton.setText("save select\nsample IDs")
         QObject.connect(savesampleButton, SIGNAL("pressed()"), self.writesamplelist)
         
+        
+        filterfomComboBoxLabel=QLabel()
+        filterfomComboBoxLabel.setText('Filter/Smooth:')
+        self.filterfomComboBox=QComboBox()
+        self.filterfomComboBox.clear()
+        for i, l in enumerate(['None', 'Setup', 'Apply']):
+                self.filterfomComboBox.insertItem(i, l)
+        self.filterfomComboBox.setCurrentIndex(0)
+        QObject.connect(self.filterfomComboBox,SIGNAL("activated(QString)"),self.filterfomsetup)
+        
+        
+        
         savebuttonlayout=QHBoxLayout()
         savebuttonlayout.addWidget(folderButton)
         savebuttonlayout.addWidget(plotButton)
@@ -629,7 +641,7 @@ class echemvisDialog(QDialog):
         vminmaxlayout=QVBoxLayout()
         vminmaxlayout.addWidget(templab)
         vminmaxlayout.addWidget(self.vminmaxLineEdit)
-
+        vminmaxlayout.addWidget(self.revcmapCheckBox)
         templab=QLabel()
         templab.setText('below,above range colors:\nEnter a char,0-1 gray,tuple,\n"None" for ignore')
         
@@ -749,6 +761,7 @@ class echemvisDialog(QDialog):
         (xplotchoiceComboBoxLabel, self.xplotchoiceComboBox, 1, 0), \
         (yplotchoiceComboBoxLabel, self.yplotchoiceComboBox, 1, 1), \
         (ternskipComboBoxLabel, self.ternskipComboBox, 1, 2), \
+        (filterfomComboBoxLabel, self.filterfomComboBox, 2, 0), \
         ]
         
         mainlayout=QGridLayout()
@@ -758,12 +771,12 @@ class echemvisDialog(QDialog):
             templayout.addWidget(labw)
             templayout.addWidget(spw)
             ctrllayout.addLayout(templayout, i+1, j)
-        
+        i-=1
 #        ctrllayout.addWidget(folderButton, 0, 0)
 #        ctrllayout.addWidget(plotButton, 0, 1)
         ctrllayout.addLayout(savebuttonlayout, 0, 0, 1, 4)
         
-        ctrllayout.addWidget(self.revcmapCheckBox, i+2, 0)
+        #ctrllayout.addWidget(self.revcmapCheckBox, i+2, 0)
         ctrllayout.addLayout(vminmaxlayout, i+2, 1)
         ctrllayout.addLayout(outrangecollayout, i+2, 2)
         
@@ -798,7 +811,8 @@ class echemvisDialog(QDialog):
         
         
         self.setLayout(mainlayout)
-        
+        self.filterfomstr=''
+        self.filterparams=None
         self.fillcalcoptions()
         self.statusLineEdit.setText('idle')
         self.plate_id=None
@@ -1002,7 +1016,46 @@ class echemvisDialog(QDialog):
         for i, d in enumerate(self.techniquedictlist):
             self.selectind=i
             d['FOM']=self.CalcFOM()
+        if self.filterfomComboBox.currentIndex()==2:
+            self.filterfom()
+            self.filterfomstr=self.filterparams['label']
+        else:
+            self.filterfomstr=''
 
+    def filterfom(self):
+        smps=[d['Sample'] for d in self.techniquedictlist]
+        data=[d['FOM'] for d in self.techniquedictlist]
+        
+        d_smpstoave=self.filterparams['d_smpstoave']
+        newsmps=[sm for sm in d_smpstoave.keys() if sm in smps]
+        
+        datacompave=numpy.array([numpy.array([data[numpy.where(smps==smp2)[0][0]] for smp2 in d_smpstoave[smp] if smp2 in smps]).mean() for smp in newsmps])
+
+        for d in self.techniquedictlist:
+            if d['Sample'] in newsmps:
+                d['FOM']=datacompave[newsmps.index(d['Sample'])]
+            else:
+                d['FOM']=numpy.nan
+
+        #self.techniquedictlist=[d for d in self.techniquedictlist if not numpy.isnan(d['FOM'])]
+
+
+    
+    def filterfomsetup(self):
+        if self.filterfomComboBox.currentIndex()==0:
+            self.filterparams=None
+            return
+        elif self.filterfomComboBox.currentIndex()==2 and not self.filterparams is None:
+            return
+        #user-defined filterparams
+        self.filterparams={}
+        p=mygetopenfile(self, markstr='.pck file providing sample filter/smooth map', filename='.pck' )
+        f=open(p, mode='r')
+        self.filterparams['d_smpstoave']=pickle.load(f)
+        f.close()
+        self.filterparams['label']='_'+p.rpartition('_')[2].partition('.')[0]
+        self.filterfomComboBox.setCurrentIndex(2)
+        
     def get_techniquedictlist(self, ext='.txt', nfiles=99999, dbupdate=False):
         self.statusLineEdit.setText('calculating FOM')
         dlist=[]
@@ -1098,10 +1151,11 @@ class echemvisDialog(QDialog):
     def calcandplot(self, ext='.txt', dbupdate=False):
         self.get_techniquedictlist(ext=ext, dbupdate=dbupdate)
         
-        for i, d in enumerate(self.techniquedictlist):
-            self.selectind=i
-            #if not 'FOM' in d.keys(): 
-            d['FOM']=self.CalcFOM()
+        self.CalcAllFOM()
+#        for i, d in enumerate(self.techniquedictlist):
+#            self.selectind=i
+#            #if not 'FOM' in d.keys(): 
+#            d['FOM']=self.CalcFOM()
         
         i0=self.ternskipComboBox.currentIndex()
         if len(self.techniquedictlist)>0: #and updateexcludebool
@@ -1136,7 +1190,17 @@ class echemvisDialog(QDialog):
         
         getarr=lambda k:getarrfromkey(self.techniquedictlist, k)
         fom=getarr('FOM')
-        sample=getarr('Sample')
+        print fom[:10]
+        inds=numpy.where(numpy.logical_not(numpy.isnan(fom)))[0]
+        if len(inds)==0:
+            print 'ABORTING PLOTTING BECAUSE ALL FOMs ARE NaN'
+            return
+        fom=fom[inds]
+        print fom[:10]
+        sample=getarr('Sample')[inds]
+        comps=getarr('compositions')[inds]
+        x=getarr('x')[inds]
+        y=getarr('y')[inds]
         
         if self.revcmapCheckBox.isChecked():
             cmap=cm.jet_r
@@ -1177,9 +1241,6 @@ class echemvisDialog(QDialog):
         norm=colors.Normalize(vmin=self.vmin, vmax=self.vmax, clip=clip)
         print 'fom min, max, mean, std:', fom.min(), fom.max(), fom.mean(), fom.std()
         
-        comps=getarr('compositions')
-        x=getarr('x')
-        y=getarr('y')
         print 'skipoutofrange', skipoutofrange
         print len(fom)
         if skipoutofrange[0]:
@@ -1233,7 +1294,7 @@ class echemvisDialog(QDialog):
         quat.scatter(comps, c=fom, s=s, cmap=cmap, vmin=self.vmin, vmax=self.vmax)
         cb=self.plotw_quat.fig.colorbar(quat.mappable, cax=self.cbax_quat, extend=extend, format=autocolorbarformat((fom.min(), fom.max())))
         
-        fomlabel=''.join((str(self.expmntLineEdit.text()), str(self.calcoptionComboBox.currentText())))
+        fomlabel=''.join((str(self.expmntLineEdit.text()), str(self.calcoptionComboBox.currentText()), self.filterfomstr))
         self.stackedternplotdict=dict([('comps', reordercomps), ('fom', fom), ('cmap', cmap), ('norm', norm), ('ellabels', reorderlabels), ('fomlabel', fomlabel)])
         
         tern=TernaryPlot(self.plotw_tern.axes, ellabels=reorderlabels[:3], offset=0)
@@ -1446,7 +1507,7 @@ class echemvisDialog(QDialog):
             print 'no data to save'
             return
         if explab is None:
-            explab=''.join((str(self.expmntLineEdit.text()), str(self.calcoptionComboBox.currentText())))
+            explab=''.join((str(self.expmntLineEdit.text()), str(self.calcoptionComboBox.currentText()), self.filterfomstr))
         if p is None:
             p=mygetsavefile(parent=self, markstr='save spreadsheet string', filename=os.path.split(self.folderpath)[1]+'_'+explab+'.txt', xpath=self.kexperiments)
         elif os.path.isdir(p):
@@ -1490,7 +1551,7 @@ class echemvisDialog(QDialog):
             print 'no data to save'
             return
         if explab is None:
-            explab=''.join((str(self.expmntLineEdit.text()), str(self.calcoptionComboBox.currentText())))
+            explab=''.join((str(self.expmntLineEdit.text()), str(self.calcoptionComboBox.currentText()), self.filterfomstr))
         if p is None:
             p=mygetsavefile(parent=self, markstr='save spreadsheet string', filename=os.path.split(self.folderpath)[1]+'_'+explab+'.txt', xpath=self.kexperiments)
         elif os.path.isdir(p):
@@ -1538,7 +1599,7 @@ class echemvisDialog(QDialog):
             print 'abort autosave - no data to save'
             return
         if explab is None:
-            explab=''.join((str(self.expmntLineEdit.text()), str(self.calcoptionComboBox.currentText())))
+            explab=''.join((str(self.expmntLineEdit.text()), str(self.calcoptionComboBox.currentText()), self.filterfomstr))
         
         #try to get plate id from folder name; if successful (finds a string of digits) and dbdatasource=2, create folder in K: experiments; works on *nix and Windows, untested on OSX
         #idfromfolder=os.path.split(self.folderpath)[1].rsplit('_',1)[1].split(' ',1)[0]
