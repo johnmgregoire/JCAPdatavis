@@ -813,6 +813,8 @@ class echemvisDialog(QDialog):
         self.setLayout(mainlayout)
         self.filterfomstr=''
         self.filterparams=None
+        self.filterparamsentry=[['remnan:\nRemove NaN', int, '1'], ['nhigh:\nUse N highest FOM', int, '999'], ['nlow:\nUse N lowest FOM', int, '0'], ['nsig:\nRemove outliers beyond N sigma', float, '999.']]
+        
         self.fillcalcoptions()
         self.statusLineEdit.setText('idle')
         self.plate_id=None
@@ -1029,7 +1031,29 @@ class echemvisDialog(QDialog):
         d_smpstoave=self.filterparams['d_smpstoave']
         newsmps=[sm for sm in d_smpstoave.keys() if sm in smps]
         
-        datacompave=numpy.array([numpy.array([data[numpy.where(smps==smp2)[0][0]] for smp2 in d_smpstoave[smp] if smp2 in smps]).mean() for smp in newsmps])
+        datacomparrs=[[data[numpy.where(smps==smp2)[0][0]] for smp2 in d_smpstoave[smp] if smp2 in smps] for smp in newsmps]
+        if self.filterparams['remnan']:
+            datacomparrs=[[v for v in arr if not numpy.isnan(v)] for arr in datacomparrs]
+        arrlens=[len(arr) for arr in datacomparrs]
+        if max([self.filterparams['nlow'], self.filterparams['nhigh']])<max(arrlens):
+            if self.filterparams['nlow']>self.filterparams['nhigh']:
+                datacomparrs=[sorted(arr)[:self.filterparams['nlow']] for arr in datacomparrs]
+            else:
+                datacomparrs=[sorted(arr)[::-1][:self.filterparams['nhigh']] for arr in datacomparrs]
+        if self.filterparams['nsig']<999.:
+            numstd=self.filterparams['nsig']
+            datacompave=[]
+            for arr in datacomparrs:#datacomparrs doesn't actually get updated here. 
+                arr=numpy.array(arr)
+                arr2=numpy.abs((arr-arr.mean())/arr.std())
+                while numpy.any(arr2>numstd):
+                    #print (arr2>numstd).sum()
+                    arr=numpy.delete(arr, arr2.argmax())
+                    arr2=numpy.abs((arr-arr.mean())/arr.std())
+                datacompave+=[arr.mean()]
+        else:
+            datacompave=numpy.array([numpy.array(arr).mean() for arr in datacomparrs])
+
 
         for d in self.techniquedictlist:
             if d['Sample'] in newsmps:
@@ -1054,6 +1078,15 @@ class echemvisDialog(QDialog):
         self.filterparams['d_smpstoave']=pickle.load(f)
         f.close()
         self.filterparams['label']='_'+p.rpartition('_')[2].partition('.')[0]
+        
+         
+        ans=userinputcaller(self, inputs=self.filterparamsentry, title='Enter database credentials', cancelallowed=True)
+        if ans is None:
+            self.filterparams=None
+            return
+        for a, tup in zip(ans, self.filterparamsentry):
+            self.filterparams[tup[0].partition(':')[0]]=a
+            
         self.filterfomComboBox.setCurrentIndex(2)
         
     def get_techniquedictlist(self, ext='.txt', nfiles=99999, dbupdate=False):
