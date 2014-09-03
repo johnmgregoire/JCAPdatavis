@@ -1074,7 +1074,7 @@ class echemvisDialog(QDialog):
         #user-defined filterparams
         self.filterparams={}
         p=mygetopenfile(self, markstr='.pck file providing sample filter/smooth map', filename='.pck' )
-        f=open(p, mode='r')
+        f=open(p, mode='rU')
         self.filterparams['d_smpstoave']=pickle.load(f)
         f.close()
         self.filterparams['label']='_'+p.rpartition('_')[2].partition('.')[0]
