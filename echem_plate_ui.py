@@ -71,6 +71,7 @@ from myquaternaryutility import QuaternaryPlot
 from quaternary_FOM_stackedtern2 import *
 from quaternary_FOM_stackedtern20 import *
 from quaternary_FOM_stackedtern30 import *
+from quaternary_FOM_stackedtern9of100 import *
 from quaternary_FOM_bintern import *
 
 sys.path.append(os.path.join(PyCodePath,'JCAPPyDBComm'))
@@ -360,7 +361,34 @@ class echem30axesWidget(QDialog):
         else:
             cblabel=''
         scatter_30axes(d['comps'], d['fom'], self.stpl, s=18, edgecolors='none', cb=cb, cblabel=cblabel, cmap=d['cmap'], norm=d['norm'])
+
+class echem100axesWidget(QDialog):
+    def __init__(self, parent=None, ellabels=['A', 'B', 'C', 'D']):
+        super(echem100axesWidget, self).__init__(parent)
         
+        mainlayout=QVBoxLayout()
+        
+        self.plotw=plotwidget(self)
+        self.plotw.fig.clf()
+        self.axl, self.stpl=make9of100ternaxes(fig=self.plotw.fig, ellabels=ellabels)
+        
+        mainlayout.addWidget(self.plotw)
+        
+        self.buttonBox = QDialogButtonBox(self)
+        self.buttonBox.setGeometry(QRect(520, 195, 160, 26))
+        self.buttonBox.setOrientation(Qt.Horizontal)
+        self.buttonBox.setStandardButtons(QDialogButtonBox.Ok)
+        QObject.connect(self.buttonBox, SIGNAL("accepted()"), self.accept)
+        mainlayout.addWidget(self.buttonBox)
+        
+        self.setLayout(mainlayout)
+    
+    def plot(self, d, cb=True):
+        if 'fomlabel' in d.keys():
+            cblabel=d['fomlabel']
+        else:
+            cblabel=''
+        scatter_9of100axes(d['comps'], d['fom'], self.stpl, s=20, edgecolors='none', cb=cb, cblabel=cblabel, cmap=d['cmap'], norm=d['norm'])
         
 class echem4axesWidget(QDialog):
     def __init__(self, parent=None, ellabels=['A', 'B', 'C', 'D']):
@@ -685,6 +713,10 @@ class echemvisDialog(QDialog):
         stackedtern30Button.setText("Create stacked\ntern at 3.33%")
         QObject.connect(stackedtern30Button, SIGNAL("pressed()"), self.stackedtern30window)
         
+        stackedtern100Button=QPushButton()
+        stackedtern100Button.setText("Create stacked\ntern at 1%")
+        QObject.connect(stackedtern100Button, SIGNAL("pressed()"), self.stackedtern100window)
+        
         tern4Button=QPushButton()
         tern4Button.setText("Create ternary\nfaces")
         QObject.connect(tern4Button, SIGNAL("pressed()"), self.tern4window)
@@ -791,9 +823,10 @@ class echemvisDialog(QDialog):
         ctrllayout.addWidget(stackedtern20Button, i+5, 0)
         ctrllayout.addWidget(tern4Button, i+5, 1)
         ctrllayout.addWidget(binlinesButton, i+5, 2)
+        ctrllayout.addWidget(stackedtern100Button, i+6, 0)
         
-        ctrllayout.addLayout(E0layout, i+6, 0, 1, 2)
-        ctrllayout.addLayout(Islayout, i+6, 2, 1, 2)
+        ctrllayout.addLayout(E0layout, i+6, 1, 1, 1)
+        ctrllayout.addLayout(Islayout, i+6, 2, 1, 1)
         
         ctrllayout.addWidget(selectbuttonlab, i+7, 0)
         #ctrllayout.addLayout(selectsamplelayout, i+6, 1, 1, 2)
@@ -1358,6 +1391,15 @@ class echemvisDialog(QDialog):
         
         #scatter_10axes(d['comps'], d['fom'], self.echem10.stpl, s=18, edgecolors='none', cmap=d['cmap'], norm=d['norm'])
         self.echem10.exec_()
+    
+    def stackedtern100window(self):
+        d=self.stackedternplotdict
+        self.echem100=echem100axesWidget(parent=None, ellabels=d['ellabels'])
+        self.echem100.plot(d, cb=True)
+
+        #scatter_30axes(d['comps'], d['fom'], self.echem30.stpl, s=18, edgecolors='none', cmap=d['cmap'], norm=d['norm'])
+        #self.echem30.show()
+        self.echem100.exec_()
         
     def stackedtern30window(self):
         d=self.stackedternplotdict
