@@ -91,13 +91,13 @@ except:
     pass
 
 
-    
+
 class messageDialog(QDialog):
     def __init__(self, parent=None, title=''):
         super(messageDialog, self).__init__(parent)
         self.setWindowTitle(title)
         mainlayout=QGridLayout()
-  
+
         self.buttonBox = QDialogButtonBox(self)
         self.buttonBox.setGeometry(QRect(520, 195, 160, 26))
         self.buttonBox.setOrientation(Qt.Horizontal)
@@ -105,11 +105,11 @@ class messageDialog(QDialog):
         QObject.connect(self.buttonBox, SIGNAL("accepted()"), self.accept)
         QObject.connect(self.buttonBox, SIGNAL("rejected()"), self.reject)
         mainlayout.addWidget(self.buttonBox, 0, 0)
-         
+
         QObject.connect(self.buttonBox,SIGNAL("accepted()"),self.ExitRoutine)
     def ExitRoutine(self):
         return
-        
+
 def mygetopenfile(parent=None, xpath="%s" % os.getcwd(),markstr='', filename='' ):
     if parent is None:
         xapp = QApplication(sys.argv)
@@ -150,7 +150,7 @@ def mygetdir(parent=None, xpath="%s" % os.getcwd(),markstr='' ):
         xapp.quit()
         return returnfn
     return unicode(QFileDialog.getExistingDirectory(parent,''.join(['Select directory:', markstr]), xpath))
-    
+
 
 def userinputcaller(parent, inputs=[('testnumber', int)], title='Enter values',  cancelallowed=True):
     problem=True
@@ -161,7 +161,7 @@ def userinputcaller(parent, inputs=[('testnumber', int)], title='Enter values', 
         if not idialog.ok and cancelallowed:
             return None
         inputs=[(tup[0], tup[1], s) for tup, s  in zip(inputs, idialog.inputstrlist)]
-        
+
     return idialog.ans
 
 class userinputDialog(QDialog):
@@ -180,21 +180,21 @@ class userinputDialog(QDialog):
                 le.setText(tup[2])
             self.lelist+=[le]
             mainlayout.addWidget(lab, 0, i, 1, 1)
-            mainlayout.addWidget(le, 1, i, 1, 1)    
+            mainlayout.addWidget(le, 1, i, 1, 1)
         self.buttonBox = QDialogButtonBox(self)
         self.buttonBox.setGeometry(QRect(520, 195, 160, 26))
         self.buttonBox.setOrientation(Qt.Horizontal)
         self.buttonBox.setStandardButtons(QDialogButtonBox.Ok)
         QObject.connect(self.buttonBox, SIGNAL("accepted()"), self.accept)
         mainlayout.addWidget(self.buttonBox, 2, 0, len(inputs), 1)
-         
+
         QObject.connect(self.buttonBox,SIGNAL("accepted()"),self.ExitRoutine)
-        
+
         self.setLayout(mainlayout)
-        
-        
+
+
         QMetaObject.connectSlotsByName(self)
-        
+
         self.problem=False
         self.ok=False
 
@@ -226,7 +226,7 @@ class selectdbsessionsDialog(QDialog):
         super(selectdbsessionsDialog, self).__init__(parent)
         self.setWindowTitle(title)
         mainlayout=QVBoxLayout()
-        
+
         self.cblist=[]
         self.cbinds=[]
         for count,  (ex, (t0, t1), techl) in enumerate(ex_trange_techl[:maxsessions]):
@@ -247,14 +247,14 @@ class selectdbsessionsDialog(QDialog):
             self.cblist+=[cb]
             self.cbinds+=[range(maxsessions, len(ex_trange_techl))]
         cb.setChecked(True)
-        
+
         self.buttonBox = QDialogButtonBox(self)
         self.buttonBox.setGeometry(QRect(520, 195, 160, 26))
         self.buttonBox.setOrientation(Qt.Horizontal)
         self.buttonBox.setStandardButtons(QDialogButtonBox.Ok)
         QObject.connect(self.buttonBox, SIGNAL("accepted()"), self.accept)
         mainlayout.addWidget(self.buttonBox)
-         
+
         QObject.connect(self.buttonBox,SIGNAL("accepted()"),self.ExitRoutine)
         self.setLayout(mainlayout)
         QMetaObject.connectSlotsByName(self)
@@ -263,7 +263,7 @@ class selectdbsessionsDialog(QDialog):
         for cb, l in zip(self.cblist, self.cbinds):
             if cb.isChecked():
                 self.selectinds+=l
-                
+
 class MainMenu(QMainWindow):
     def __init__(self, previousmm, execute=True, **kwargs):#, TreeWidg):
         super(MainMenu, self).__init__(None)
@@ -281,52 +281,52 @@ class MainMenu(QMainWindow):
 class echem10axesWidget(QDialog):
     def __init__(self, parent=None, ellabels=['A', 'B', 'C', 'D']):
         super(echem10axesWidget, self).__init__(parent)
-        
+
         mainlayout=QVBoxLayout()
-        
+
         self.plotw=plotwidget(self)
         self.plotw.fig.clf()
         self.axl, self.stpl=make10ternaxes(fig=self.plotw.fig, ellabels=ellabels)
-        
+
         mainlayout.addWidget(self.plotw)
-        
+
         self.buttonBox = QDialogButtonBox(self)
         self.buttonBox.setGeometry(QRect(520, 195, 160, 26))
         self.buttonBox.setOrientation(Qt.Horizontal)
         self.buttonBox.setStandardButtons(QDialogButtonBox.Ok)
         QObject.connect(self.buttonBox, SIGNAL("accepted()"), self.accept)
         mainlayout.addWidget(self.buttonBox)
-        
+
         self.setLayout(mainlayout)
-    
+
     def plot(self, d, cb=True):
         if 'fomlabel' in d.keys():
             cblabel=d['fomlabel']
         else:
             cblabel=''
         scatter_10axes(d['comps'], d['fom'], self.stpl, s=18, edgecolors='none', cb=cb, cblabel=cblabel, cmap=d['cmap'], norm=d['norm'])
-        
+
 class echem20axesWidget(QDialog):
     def __init__(self, parent=None, ellabels=['A', 'B', 'C', 'D']):
         super(echem20axesWidget, self).__init__(parent)
-        
+
         mainlayout=QVBoxLayout()
-        
+
         self.plotw=plotwidget(self)
         self.plotw.fig.clf()
         self.axl, self.stpl=make20ternaxes(fig=self.plotw.fig, ellabels=ellabels)
-        
+
         mainlayout.addWidget(self.plotw)
-        
+
         self.buttonBox = QDialogButtonBox(self)
         self.buttonBox.setGeometry(QRect(520, 195, 160, 26))
         self.buttonBox.setOrientation(Qt.Horizontal)
         self.buttonBox.setStandardButtons(QDialogButtonBox.Ok)
         QObject.connect(self.buttonBox, SIGNAL("accepted()"), self.accept)
         mainlayout.addWidget(self.buttonBox)
-        
+
         self.setLayout(mainlayout)
-    
+
     def plot(self, d, cb=True):
         if 'fomlabel' in d.keys():
             cblabel=d['fomlabel']
@@ -337,24 +337,24 @@ class echem20axesWidget(QDialog):
 class echem30axesWidget(QDialog):
     def __init__(self, parent=None, ellabels=['A', 'B', 'C', 'D']):
         super(echem30axesWidget, self).__init__(parent)
-        
+
         mainlayout=QVBoxLayout()
-        
+
         self.plotw=plotwidget(self)
         self.plotw.fig.clf()
         self.axl, self.stpl=make30ternaxes(fig=self.plotw.fig, ellabels=ellabels)
-        
+
         mainlayout.addWidget(self.plotw)
-        
+
         self.buttonBox = QDialogButtonBox(self)
         self.buttonBox.setGeometry(QRect(520, 195, 160, 26))
         self.buttonBox.setOrientation(Qt.Horizontal)
         self.buttonBox.setStandardButtons(QDialogButtonBox.Ok)
         QObject.connect(self.buttonBox, SIGNAL("accepted()"), self.accept)
         mainlayout.addWidget(self.buttonBox)
-        
+
         self.setLayout(mainlayout)
-    
+
     def plot(self, d, cb=True):
         if 'fomlabel' in d.keys():
             cblabel=d['fomlabel']
@@ -365,52 +365,52 @@ class echem30axesWidget(QDialog):
 class echem100axesWidget(QDialog):
     def __init__(self, parent=None, ellabels=['A', 'B', 'C', 'D']):
         super(echem100axesWidget, self).__init__(parent)
-        
+
         mainlayout=QVBoxLayout()
-        
+
         self.plotw=plotwidget(self)
         self.plotw.fig.clf()
         self.axl, self.stpl=make9of100ternaxes(fig=self.plotw.fig, ellabels=ellabels)
-        
+
         mainlayout.addWidget(self.plotw)
-        
+
         self.buttonBox = QDialogButtonBox(self)
         self.buttonBox.setGeometry(QRect(520, 195, 160, 26))
         self.buttonBox.setOrientation(Qt.Horizontal)
         self.buttonBox.setStandardButtons(QDialogButtonBox.Ok)
         QObject.connect(self.buttonBox, SIGNAL("accepted()"), self.accept)
         mainlayout.addWidget(self.buttonBox)
-        
+
         self.setLayout(mainlayout)
-    
+
     def plot(self, d, cb=True):
         if 'fomlabel' in d.keys():
             cblabel=d['fomlabel']
         else:
             cblabel=''
         scatter_9of100axes(d['comps'], d['fom'], self.stpl, s=20, edgecolors='none', cb=cb, cblabel=cblabel, cmap=d['cmap'], norm=d['norm'])
-        
+
 class echem4axesWidget(QDialog):
     def __init__(self, parent=None, ellabels=['A', 'B', 'C', 'D']):
         super(echem4axesWidget, self).__init__(parent)
-        
+
         mainlayout=QVBoxLayout()
-        
+
         self.plotw=plotwidget(self)
         self.plotw.fig.clf()
         self.axl, self.stpl=make4ternaxes(fig=self.plotw.fig, ellabels=ellabels)
-        
+
         mainlayout.addWidget(self.plotw)
-        
+
         self.buttonBox = QDialogButtonBox(self)
         self.buttonBox.setGeometry(QRect(520, 195, 160, 26))
         self.buttonBox.setOrientation(Qt.Horizontal)
         self.buttonBox.setStandardButtons(QDialogButtonBox.Ok)
         QObject.connect(self.buttonBox, SIGNAL("accepted()"), self.accept)
         mainlayout.addWidget(self.buttonBox)
-        
+
         self.setLayout(mainlayout)
-    
+
     def plot(self, d, cb=True):
         if 'fomlabel' in d.keys():
             cblabel=d['fomlabel']
@@ -422,24 +422,24 @@ class echem4axesWidget(QDialog):
 class echembinWidget(QDialog):
     def __init__(self, parent=None, ellabels=['A', 'B', 'C', 'D']):
         super(echembinWidget, self).__init__(parent)
-        
+
         mainlayout=QVBoxLayout()
-        
+
         self.plotw=plotwidget(self)
         self.plotw.fig.clf()
         self.axbin, self.axbininset=plotbinarylines_axandinset(fig=self.plotw.fig, ellabels=ellabels)
-        
+
         mainlayout.addWidget(self.plotw)
-        
+
         self.buttonBox = QDialogButtonBox(self)
         self.buttonBox.setGeometry(QRect(520, 195, 160, 26))
         self.buttonBox.setOrientation(Qt.Horizontal)
         self.buttonBox.setStandardButtons(QDialogButtonBox.Ok)
         QObject.connect(self.buttonBox, SIGNAL("accepted()"), self.accept)
         mainlayout.addWidget(self.buttonBox)
-        
+
         self.setLayout(mainlayout)
-    
+
     def plot(self, d, cb=True, ellabels=['A', 'B', 'C', 'D']):
         if 'fomlabel' in d.keys():
             cblabel=d['fomlabel']
@@ -448,8 +448,8 @@ class echembinWidget(QDialog):
         plotbinarylines_quat(self.axbin, d['comps'], d['fom'], markersize=10, ellabels=d['ellabels'], linewidth=2)
         self.axbin.set_xlabel('binary composition', fontsize=16)
         self.axbin.set_ylabel(cblabel, fontsize=16)
-        
-        
+
+
 class echemvisDialog(QDialog):
     def __init__(self, parent=None, title='', folderpath=None):
         super(echemvisDialog, self).__init__(parent)
@@ -457,7 +457,7 @@ class echemvisDialog(QDialog):
 #        self.echem30=echem30axesWidget()
 #        self.echem30.show()
         self.plotillumkey=None
-        
+
         #Uncomment out next line to disable db access
         #folderpath=PyCodePath
         if folderpath is None:
@@ -486,50 +486,50 @@ class echemvisDialog(QDialog):
             self.dbdatasource=0
 
         self.techniquedictlist=[]
-        
+
         self.plotw_select=plotwidget(self)
 #        self.plotw_select.axes.set_xlabel('')
 #        self.plotw_select.axes.set_ylabel('')
         #self.plotw_select.axes.set_aspect(1)
-        
+
         self.plotw_plate=plotwidget(self)
 #        self.plotw_plate.axes.set_xlabel('')
 #        self.plotw_plate.axes.set_ylabel('')
         self.plotw_plate.axes.set_aspect(1)
-        
+
         self.plotw_tern=plotwidget(self)
 #        self.plotw_tern.axes.set_xlabel('')
 #        self.plotw_tern.axes.set_ylabel('')
         #self.plotw_tern.axes.set_aspect(1)
-        
+
         self.plotw_quat=plotwidget(self, projection3d=True)
 #        self.plotw_quat.axes.set_xlabel('')
 #        self.plotw_quat.axes.set_ylabel('')
         #self.plotw_quat.axes.set_aspect(1)
-        
+
         self.plotw_aux=plotwidget(self)
 #        self.plotw_aux.axes.set_xlabel('')
 #        self.plotw_aux.axes.set_ylabel('')
         #self.plotw_aux.axes.set_aspect(1)
-        
+
         axrect=[0.82, 0.1, 0.04, 0.8]
-        
-        
+
+
         self.plotw_plate.fig.subplots_adjust(left=0, right=axrect[0]-.01)
         self.cbax_plate=self.plotw_plate.fig.add_axes(axrect)
-        
+
         self.plotw_tern.fig.subplots_adjust(left=0, right=axrect[0]-.01)
         self.cbax_tern=self.plotw_tern.fig.add_axes(axrect)
-        
+
         self.plotw_quat.fig.subplots_adjust(left=0, right=axrect[0]-.01)
         self.cbax_quat=self.plotw_quat.fig.add_axes(axrect)
-        
+
         self.plotw_select.fig.subplots_adjust(left=.2)
         self.plotw_aux.fig.subplots_adjust(left=.2)
 
 
         QObject.connect(self.plotw_plate, SIGNAL("genericclickonplot"), self.plateclickprocess)
-        
+
 #in options, always make an option that does not require user input at index 0
         CVops=[\
         ['Imax', ['I(A)'], []], \
@@ -541,34 +541,34 @@ class echemvisDialog(QDialog):
         ['Iphoto_min', ['Illum', 'I(A)', 'Ewe(V)', 't(s)'], [['frac of Illum segment start', float, '0.4'], ['frac of Illum segment end', float, '0.95'], ['frac of Dark segment start', float, '0.4'], ['frac of Dark segment end', float, '0.95'], ['Illum signal key', str, 'Toggle'], ['Illum signal time shift (s)', float, '0.'], ['Illum Threshold', float, '0.5'], ['Illum Invert', int, '0'], ['num illum cycles', int, '2'], ['0 from beginning, 1 from end', int, '1']]], \
         ['None', ['I(A)', 'Ewe(V)'], []], \
         ]
-        
+
         OCVops=[\
         ['Efin', ['Ewe(V)'], []], \
         ['Eave', ['Ewe(V)', 't(s)'], [['Interval(s)', float, '2.'], ['Num StdDev outlier', float, '2.'], ['Num Pts in Window', int, '999999'], ['0 from beginning, 1 from end', int, '1']]], \
         ['Ess', ['Ewe(V)'], [['Weight Exponent for NumPts', float, '1.'], ['NumPts test interval', int, '10']]], \
         ['Ephoto', ['Illum', 'Ewe(V)', 'I(A)', 't(s)'], [['frac of Illum segment start', float, '0.4'], ['frac of Illum segment end', float, '0.95'], ['frac of Dark segment start', float, '0.4'], ['frac of Dark segment end', float, '0.95'], ['Illum signal key', str, 'Toggle'], ['Illum signal time shift (s)', float, '0.'], ['Illum Threshold', float, '0.5'], ['Illum Invert', int, '0'], ['num illum cycles', int, '2'], ['0 from beginning, 1 from end', int, '1']]], \
         ]
-        
+
         CPops=[\
         ['Efin', ['Ewe(V)'], []], \
         ['Eave', ['Ewe(V)', 't(s)'],  [['Interval(s)', float, '2.'], ['Num StdDev outlier', float, '2.'], ['Num Pts in Window', int, '999999'], ['0 from beginning, 1 from end', int, '1']]], \
         ['Ess', ['Ewe(V)'], [['Weight Exponent for NumPts', float, '1.'], ['NumPts test interval', int, '10']]], \
         ['Ephoto', ['Illum', 'Ewe(V)', 'I(A)', 't(s)'], [['frac of Illum segment start', float, '0.4'], ['frac of Illum segment end', float, '0.95'], ['frac of Dark segment start', float, '0.4'], ['frac of Dark segment end', float, '0.95'], ['Illum signal key', str, 'Toggle'], ['Illum signal time shift (s)', float, '0.'], ['Illum Threshold', float, '0.5'], ['Illum Invert', int, '0'], ['num illum cycles', int, '2'], ['0 from beginning, 1 from end', int, '1']]], \
         ]
-        
+
         CAops=[\
         ['Ifin', ['I(A)'], []], \
         ['Iave', ['I(A)', 't(s)'],  [['Interval(s)', float, '2.'], ['Num StdDev outlier', float, '2.'], ['Num Pts in Window', int, '999999'], ['0 from beginning, 1 from end', int, '1']]], \
         ['Iss', ['I(A)'], [['Weight Exponent for NumPts', float, '1.'], ['NumPts test interval', int, '10']]], \
         ['Iphoto', ['Illum', 'I(A)', 'Ewe(V)', 't(s)'], [['frac of Illum segment start', float, '0.4'], ['frac of Illum segment end', float, '0.95'], ['frac of Dark segment start', float, '0.4'], ['frac of Dark segment end', float, '0.95'], ['Illum signal key', str, 'Toggle'], ['Illum signal time shift (s)', float, '0.'], ['Illum Threshold', float, '0.5'], ['Illum Invert', int, '0'], ['num illum cycles', int, '2'], ['0 from beginning, 1 from end', int, '1']]], \
         ]
-        
+
         Bubbleops=[\
         ['slopefin', ['Maxslope'], []], \
         ['Intfin', ['Intensity'], []], \
         ]
-        
-        
+
+
         self.expmnt_calc_options=[['OCV', OCVops], ['CP', CPops], ['CA', CAops], ['CV', CVops], ['Bubble', Bubbleops]]
         self.expmnt_calc_lastusedvals=[[[] for calcopt in opslist] for opname, opslist in self.expmnt_calc_options]
         expmntComboBoxLabel=QLabel()
@@ -577,21 +577,21 @@ class echemvisDialog(QDialog):
         for i, tup in enumerate(self.expmnt_calc_options):
             self.expmntComboBox.insertItem(i, tup[0])
         self.expmntComboBox.setCurrentIndex(0)
-        
+
         calcoptionComboBoxLabel=QLabel()
         calcoptionComboBoxLabel.setText('FOM:')
         self.calcoptionComboBox=QComboBox()
-        
+
         ternskipComboBoxLabel=QLabel()
         ternskipComboBoxLabel.setText('Exclude for ternary:')
         self.ternskipComboBox=QComboBox()
         for i, l in enumerate(['A', 'B', 'C', 'D']):
             self.ternskipComboBox.insertItem(i, l)
         self.ternskipComboBox.setCurrentIndex(i)
-        
+
         QObject.connect(self.expmntComboBox,SIGNAL("activated(QString)"),self.fillcalcoptions)
         QObject.connect(self.calcoptionComboBox,SIGNAL("activated(QString)"),self.getcalcparams)
-        
+
         self.xplotchoiceComboBox=QComboBox()
         self.yplotchoiceComboBox=QComboBox()
         self.plotkeys=['t(s)', 'I(A)', 'Ewe(V)', 'Ece(V)', 'Ewe-E0(V)', 'I*Is(A)']
@@ -601,39 +601,39 @@ class echemvisDialog(QDialog):
             self.yplotchoiceComboBox.insertItem(i, nam)
         self.xplotchoiceComboBox.setCurrentIndex(0)
         self.yplotchoiceComboBox.setCurrentIndex(1)
-        
+
         xplotchoiceComboBoxLabel=QLabel()
         xplotchoiceComboBoxLabel.setText('x-axis')
         yplotchoiceComboBoxLabel=QLabel()
         yplotchoiceComboBoxLabel.setText('y-axis')
-        
+
         expmntLineEditLabel=QLabel()
         expmntLineEditLabel.setText('Technique Name:')
         self.expmntLineEdit=QLineEdit()
         self.expmntLineEdit.setText('OCV0')
-        
+
         folderButton=QPushButton()
         folderButton.setText("select\nfolder")
         QObject.connect(folderButton, SIGNAL("pressed()"), self.selectfolder)
-        
+
         plotButton=QPushButton()
         plotButton.setText("update\nfigures")
         QObject.connect(plotButton, SIGNAL("pressed()"), self.calcandplot)
         #QObject.connect(plotButton, SIGNAL("pressed()"), self.writefileauto)
-        
+
         updateButton=QPushButton()
         updateButton.setText("update\ndata")
         QObject.connect(updateButton, SIGNAL("pressed()"), self.calcandplotwithupdate)
-        
+
         saveButton=QPushButton()
         saveButton.setText("save FOM\nspreadhseet")
         QObject.connect(saveButton, SIGNAL("pressed()"), self.writefomfile_txt)
-        
+
         savesampleButton=QPushButton()
         savesampleButton.setText("save select\nsample IDs")
         QObject.connect(savesampleButton, SIGNAL("pressed()"), self.writesamplelist)
-        
-        
+
+
         filterfomComboBoxLabel=QLabel()
         filterfomComboBoxLabel.setText('Filter/Smooth:')
         self.filterfomComboBox=QComboBox()
@@ -642,9 +642,9 @@ class echemvisDialog(QDialog):
                 self.filterfomComboBox.insertItem(i, l)
         self.filterfomComboBox.setCurrentIndex(0)
         QObject.connect(self.filterfomComboBox,SIGNAL("activated(QString)"),self.filterfomsetup)
-        
-        
-        
+
+
+
         savebuttonlayout=QHBoxLayout()
         savebuttonlayout.addWidget(folderButton)
         savebuttonlayout.addWidget(plotButton)
@@ -654,77 +654,77 @@ class echemvisDialog(QDialog):
 #        savebuttonlayout=QHBoxLayout()
 #        savebuttonlayout.addWidget(saveButton)
 #        savebuttonlayout.addWidget(savesampleButton)
-        
+
         self.infoLabel=QLabel()
         self.infodef='Q=10,15,40,80 1/nm -> \nd=0.63,0.42,0.16,0.079 nm\n'
-        
+
         self.revcmapCheckBox=QCheckBox()
         self.revcmapCheckBox.setText('reverse cmap?')
-        
+
         templab=QLabel()
         templab.setText('min,max colorbar')
-        
+
         self.vminmaxLineEdit=QLineEdit()
-        
+
         vminmaxlayout=QVBoxLayout()
         vminmaxlayout.addWidget(templab)
         vminmaxlayout.addWidget(self.vminmaxLineEdit)
         vminmaxlayout.addWidget(self.revcmapCheckBox)
         templab=QLabel()
         templab.setText('below,above range colors:\nEnter a char,0-1 gray,tuple,\n"None" for ignore')
-        
+
         self.aboverangecolLineEdit=QLineEdit()
         self.aboverangecolLineEdit.setText('k')
         self.belowrangecolLineEdit=QLineEdit()
         self.belowrangecolLineEdit.setText('0.9')
-        
+
         outrangecollayout=QGridLayout()
         outrangecollayout.addWidget(templab, 0, 0, 2, 1)
         outrangecollayout.addWidget(self.belowrangecolLineEdit, 0, 1)
         outrangecollayout.addWidget(self.aboverangecolLineEdit, 1, 1)
-        
+
         self.statusLineEdit=QLineEdit()
         self.statusLineEdit.setReadOnly(True)
-        
+
         self.measdescLineEdit=QLineEdit()
         templab=QLabel()
         templab.setText('Meas. Desc. for csv')
-    
+
         measdescLayout=QVBoxLayout()
         measdescLayout.addWidget(templab)
         measdescLayout.addWidget(self.measdescLineEdit)
-        
+
         templab=QLabel()
         templab.setText('DAQ time')
         self.daqtimeLineEdit=QLineEdit()
         daqtimelayout=QVBoxLayout()
         daqtimelayout.addWidget(templab)
         daqtimelayout.addWidget(self.daqtimeLineEdit)
-        
+
         stackedtern10Button=QPushButton()
         stackedtern10Button.setText("Create stacked\ntern at 10%")
         QObject.connect(stackedtern10Button, SIGNAL("pressed()"), self.stackedtern10window)
-        
+
         stackedtern20Button=QPushButton()
         stackedtern20Button.setText("Create stacked\ntern at 5%")
         QObject.connect(stackedtern20Button, SIGNAL("pressed()"), self.stackedtern20window)
-        
+
         stackedtern30Button=QPushButton()
         stackedtern30Button.setText("Create stacked\ntern at 3.33%")
         QObject.connect(stackedtern30Button, SIGNAL("pressed()"), self.stackedtern30window)
-        
+
         stackedtern100Button=QPushButton()
         stackedtern100Button.setText("Create stacked\ntern at 1%")
         QObject.connect(stackedtern100Button, SIGNAL("pressed()"), self.stackedtern100window)
-        
+
         tern4Button=QPushButton()
         tern4Button.setText("Create ternary\nfaces")
         QObject.connect(tern4Button, SIGNAL("pressed()"), self.tern4window)
 
         binlinesButton=QPushButton()
         binlinesButton.setText("Create binary\nlines")
-        QObject.connect(binlinesButton, SIGNAL("pressed()"), self.binlineswindow)        
-        
+        QObject.connect(binlinesButton, SIGNAL("pressed()"), self.binlineswindow)
+
         templab=QLabel()
         templab.setText('E0=Equil.Pot.(V):')
         self.E0SpinBox=QDoubleSpinBox()
@@ -735,7 +735,7 @@ class echemvisDialog(QDialog):
         E0layout=QHBoxLayout()
         E0layout.addWidget(templab)
         E0layout.addWidget(self.E0SpinBox)
-        
+
         templab=QLabel()
         templab.setText('Is=I scaling:')
         self.IsSpinBox=QDoubleSpinBox()
@@ -745,7 +745,7 @@ class echemvisDialog(QDialog):
         Islayout=QHBoxLayout()
         Islayout.addWidget(templab)
         Islayout.addWidget(self.IsSpinBox)
-        
+
         self.overlayselectCheckBox=QCheckBox()
         self.overlayselectCheckBox.setText("overlay on\n'select' plot")
         self.legendselectLineEdit=QLineEdit()
@@ -755,37 +755,37 @@ class echemvisDialog(QDialog):
         legendlayout=QVBoxLayout()
         legendlayout.addWidget(templab)
         legendlayout.addWidget(self.legendselectLineEdit)
-        
-        
-        
+
+
+
         selectbuttonlayout=QHBoxLayout()
         selectbuttonlab=QLabel()
         selectbuttonlab.setText("Select samples by mouse right-click\n  OR filter FOM in this range:")
         #selectbuttonlayout.addWidget(templab, 0, 0, 1, 3)
-        
+
         selectbelowButton=QPushButton()
         selectbelowButton.setText("(-INF,min)")
         QObject.connect(selectbelowButton, SIGNAL("pressed()"), self.selectbelow)
         selectbuttonlayout.addWidget(selectbelowButton)#, 1, 0)
-        
+
         selectbetweenButton=QPushButton()
         selectbetweenButton.setText("[min,max)")
         QObject.connect(selectbetweenButton, SIGNAL("pressed()"), self.selectbetween)
         selectbuttonlayout.addWidget(selectbetweenButton)#, 1, 1)
-        
+
         selectaboveButton=QPushButton()
         selectaboveButton.setText("[max,INF)")
         QObject.connect(selectaboveButton, SIGNAL("pressed()"), self.selectabove)
         selectbuttonlayout.addWidget(selectaboveButton)#, 1, 2)
-    
-        
+
+
         selectsamplelab=QLabel()
         selectsamplelab.setText("sample IDs selected for export")
         #selectsamplelayout=QVBoxLayout()
         #selectsamplelayout.addWidget(templab)
         self.selectsamplesLineEdit=QLineEdit()
         #selectsamplelayout.addWidget(self.selectsamplesLineEdit)
-        
+
         self.ctrlgriditems=[\
         (expmntComboBoxLabel, self.expmntComboBox, 0, 0), \
         (calcoptionComboBoxLabel, self.calcoptionComboBox, 0, 1), \
@@ -795,7 +795,7 @@ class echemvisDialog(QDialog):
         (ternskipComboBoxLabel, self.ternskipComboBox, 1, 2), \
         (filterfomComboBoxLabel, self.filterfomComboBox, 2, 0), \
         ]
-        
+
         mainlayout=QGridLayout()
         ctrllayout=QGridLayout()
         for labw, spw, i, j in self.ctrlgriditems:
@@ -807,16 +807,16 @@ class echemvisDialog(QDialog):
 #        ctrllayout.addWidget(folderButton, 0, 0)
 #        ctrllayout.addWidget(plotButton, 0, 1)
         ctrllayout.addLayout(savebuttonlayout, 0, 0, 1, 4)
-        
+
         #ctrllayout.addWidget(self.revcmapCheckBox, i+2, 0)
         ctrllayout.addLayout(vminmaxlayout, i+2, 1)
         ctrllayout.addLayout(outrangecollayout, i+2, 2)
-        
+
         #ctrllayout.addWidget(self.statusLineEdit, i+3, 0)
         ctrllayout.addLayout(measdescLayout, i+3, 0)
         ctrllayout.addWidget(self.overlayselectCheckBox, i+3, 1)
         ctrllayout.addLayout(legendlayout, i+3, 2)
-        
+
         ctrllayout.addLayout(daqtimelayout, i+4, 0)
         ctrllayout.addWidget(stackedtern10Button, i+4, 1)
         ctrllayout.addWidget(stackedtern30Button, i+4, 2)
@@ -824,30 +824,30 @@ class echemvisDialog(QDialog):
         ctrllayout.addWidget(tern4Button, i+5, 1)
         ctrllayout.addWidget(binlinesButton, i+5, 2)
         ctrllayout.addWidget(stackedtern100Button, i+6, 0)
-        
+
         ctrllayout.addLayout(E0layout, i+6, 1, 1, 1)
         ctrllayout.addLayout(Islayout, i+6, 2, 1, 1)
-        
+
         ctrllayout.addWidget(selectbuttonlab, i+7, 0)
         #ctrllayout.addLayout(selectsamplelayout, i+6, 1, 1, 2)
         ctrllayout.addWidget(selectsamplelab, i+7, 1, 1, 2)
-        
+
         ctrllayout.addLayout(selectbuttonlayout, i+8, 0)
         ctrllayout.addWidget(self.selectsamplesLineEdit, i+8, 1, 1, 2)
-        
+
         mainlayout.addLayout(ctrllayout, 0, 0)
         mainlayout.addWidget(self.plotw_select, 0, 1)
         mainlayout.addWidget(self.plotw_aux, 0, 2)
         mainlayout.addWidget(self.plotw_plate, 1, 0)
         mainlayout.addWidget(self.plotw_quat, 1, 1)
         mainlayout.addWidget(self.plotw_tern, 1, 2)
-        
-        
+
+
         self.setLayout(mainlayout)
         self.filterfomstr=''
         self.filterparams=None
         self.filterparamsentry=[['remnan:\nRemove NaN', int, '1'], ['nhigh:\nUse N highest FOM', int, '999'], ['nlow:\nUse N lowest FOM', int, '0'], ['nsig:\nRemove outliers beyond N sigma', float, '999.']]
-        
+
         self.fillcalcoptions()
         self.statusLineEdit.setText('idle')
         self.plate_id=None
@@ -858,20 +858,20 @@ class echemvisDialog(QDialog):
         else:
             self.folderpath=folderpath
         self.resize(1600, 750)
-    
-    def createdbsession(self):        
+
+    def createdbsession(self):
         ans=userinputcaller(self, inputs=[('user:', str, ''), ('password:', str, '')], title='Enter database credentials', cancelallowed=True)
         if ans is None:
             return
         self.dbc=dbcomm(user=ans[0].strip(), password=ans[1].strip(),db='hte_echemdrop_proto')
-        
+
     def selectfolder(self, plate_id=None, selectexids=None, folder=None):
         self.statusLineEdit.setText('waiting for folder input')
         if self.dbdatasource is 1:
             if not self.dbc is None:
                 self.dbc.db.close()
             self.createdbsession()
-            
+
             if self.folderpath is None:
                 self.folderpath=mygetdir(self, markstr='select folder for saving results')
             if plate_id is None:
@@ -891,7 +891,7 @@ class echemvisDialog(QDialog):
                 self.userselectdbinds()
             else:
                 self.selectexids=selectexids
-            inds=numpy.concatenate([numpy.where(self.dbrecarrd['experiment_no']==exid)[0] for exid in self.selectexids])        
+            inds=numpy.concatenate([numpy.where(self.dbrecarrd['experiment_no']==exid)[0] for exid in self.selectexids])
             for k, v in self.dbrecarrd.iteritems():
                 self.dbrecarrd[k]=v[inds]
         else:
@@ -902,9 +902,9 @@ class echemvisDialog(QDialog):
             os.chdir(self.kexperiments)
         self.statusLineEdit.setText('idle')
         #self.calcandplot()
-        
-        
-        
+
+
+
 #        id=numpy.array(self.dbrecarrd['id'])
 #        sn=numpy.array(self.dbrecarrd['sample_no'])
 #        tn=numpy.array(self.dbrecarrd['technique_name'])
@@ -912,19 +912,19 @@ class echemvisDialog(QDialog):
         t=self.dbrecarrd['created_at']
         ex=self.dbrecarrd['experiment_no']
         tn=self.dbrecarrd['technique_name']
-        
+
         exset=sorted(list(set(ex)))
         ex_trange_techl=[(exv, numpy.sort(t[ex==exv])[[0,-1]], list(set(tn[[ex==exv]]))) for exv in exset]
-        
+
         idialog=selectdbsessionsDialog(self, ex_trange_techl=ex_trange_techl)
         idialog.exec_()
         exsetinds=idialog.selectinds
         self.selectexids=[exset[i] for i in exsetinds]
-        
 
 
 
-    
+
+
     def fillcalcoptions(self, batchmode=False):
         i=self.expmntComboBox.currentIndex()
         self.calcoptionComboBox.clear()
@@ -941,7 +941,7 @@ class echemvisDialog(QDialog):
                 if True in [techstr in d['path'] for d in self.techniquedictlist]:
                     self.expmntLineEdit.setText(techstr)
                     break
-                    
+
     def getcalcparams(self):
         i=self.expmntComboBox.currentIndex()
         j=self.calcoptionComboBox.currentIndex()
@@ -956,7 +956,7 @@ class echemvisDialog(QDialog):
             print type(self.expmnt_calc_lastusedvals[i][j]), self.expmnt_calc_lastusedvals[i][j]
         #self.CalcAllFOM()
         #self.plot()
-    
+
     def CalcFOM(self):
         self.plotillumkey=None
         techdict=self.techniquedictlist[self.selectind]
@@ -1013,14 +1013,14 @@ class echemvisDialog(QDialog):
                 newikey='IllumMod'
                 techdict[newikey]=-1*techdict[ikey]
                 ikey=newikey
-            
+
             illkey=self.calckeys[1]+'_illdiff'
             err=calcdiff_ill_caller(techdict, ikey=ikey, thresh=self.CalcParams[6], ykeys=[self.calckeys[1]], xkeys=list(self.calckeys[2:]), illfracrange=(self.CalcParams[0], self.CalcParams[1]), darkfracrange=(self.CalcParams[2], self.CalcParams[3]))
             try:
 				if err or len(techdict[illkey])==0:
 					return 0
 				self.plotillumkey='IllumBool'
-				
+
 				ncycs=self.CalcParams[8]
 				fromend=self.CalcParams[9]
 				if fromend:
@@ -1028,7 +1028,7 @@ class echemvisDialog(QDialog):
 				else:
 					arr=techdict[illkey]
 				arr=arr[:ncycs]
-				
+
 				if 'min' in fcnnam:
 					returnval=min(arr)
 				elif 'max' in fcnnam:
@@ -1046,7 +1046,7 @@ class echemvisDialog(QDialog):
             return returnval-self.E0SpinBox.value()
         else:
             return returnval
-            
+
     def CalcAllFOM(self):
         for i, d in enumerate(self.techniquedictlist):
             self.selectind=i
@@ -1060,10 +1060,10 @@ class echemvisDialog(QDialog):
     def filterfom(self):
         smps=[d['Sample'] for d in self.techniquedictlist]
         data=[d['FOM'] for d in self.techniquedictlist]
-        
+
         d_smpstoave=self.filterparams['d_smpstoave']
         newsmps=[sm for sm in d_smpstoave.keys() if sm in smps]
-        
+
         datacomparrs=[[data[numpy.where(smps==smp2)[0][0]] for smp2 in d_smpstoave[smp] if smp2 in smps] for smp in newsmps]
         if self.filterparams['remnan']:
             datacomparrs=[[v for v in arr if not numpy.isnan(v)] for arr in datacomparrs]
@@ -1076,7 +1076,7 @@ class echemvisDialog(QDialog):
         if self.filterparams['nsig']<999.:
             numstd=self.filterparams['nsig']
             datacompave=[]
-            for arr in datacomparrs:#datacomparrs doesn't actually get updated here. 
+            for arr in datacomparrs:#datacomparrs doesn't actually get updated here.
                 arr=numpy.array(arr)
                 arr2=numpy.abs((arr-arr.mean())/arr.std())
                 while numpy.any(arr2>numstd):
@@ -1097,7 +1097,7 @@ class echemvisDialog(QDialog):
         #self.techniquedictlist=[d for d in self.techniquedictlist if not numpy.isnan(d['FOM'])]
 
 
-    
+
     def filterfomsetup(self):
         if self.filterfomComboBox.currentIndex()==0:
             self.filterparams=None
@@ -1111,26 +1111,26 @@ class echemvisDialog(QDialog):
         self.filterparams['d_smpstoave']=pickle.load(f)
         f.close()
         self.filterparams['label']='_'+p.rpartition('_')[2].partition('.')[0]
-        
-         
+
+
         ans=userinputcaller(self, inputs=self.filterparamsentry, title='Enter database credentials', cancelallowed=True)
         if ans is None:
             self.filterparams=None
             return
         for a, tup in zip(ans, self.filterparamsentry):
             self.filterparams[tup[0].partition(':')[0]]=a
-            
+
         self.filterfomComboBox.setCurrentIndex(2)
-        
+
     def get_techniquedictlist(self, ext='.txt', nfiles=99999, dbupdate=False):
         self.statusLineEdit.setText('calculating FOM')
         dlist=[]
         existpaths=[d['path'] for d in self.techniquedictlist]
         existmtimes=[d['mtime'] for d in self.techniquedictlist]
         self.selectind=-1
-        
+
         techname=str(self.expmntLineEdit.text())
-        
+
         if self.dbdatasource is 1:
             if len(techname)==0 and len(self.techniquedictlist)==0:
                 technamedflt=self.dbrecarrd['technique_name'][0]
@@ -1140,16 +1140,16 @@ class echemvisDialog(QDialog):
                         self.expmntLineEdit.setText(technamedflt)
                         self.fillcalcoptions()
                         break
-            
+
             if dbupdate:
                 ##this line for getting updated data
                 self.selectfolder(plate_id=self.plate_id, selectexids=self.selectexids)
-            
+
             fns=self.dbrecarrd['dc_data__t_v_a_c_i'][self.dbrecarrd['technique_name']==techname]
-            
+
             pathstoread=[os.path.join(os.path.join('J:/hte_echemdrop_proto/data','%d' %self.plate_id), fn) for fn in fns]
             updateexcludebool=True
-            
+
             dlist=[(p in existpaths and (self.techniquedictlist[existpaths.index(p)],) or (readechemtxt(p, mtime_path_fcn=self.getepoch_path),))[0] for p in pathstoread[:nfiles]]
             dlist=[d for d in dlist if d]#get rid of emtpy dictionaries
         else:
@@ -1163,9 +1163,9 @@ class echemvisDialog(QDialog):
                         self.fillcalcoptions()
                         break
             pathstoread=[os.path.join(self.folderpath, fn) for fn in fns if techname in fn and fn.endswith(ext) and fn.startswith('Sample')]
-        
+
             updateexcludebool=True
-            
+
             for p in pathstoread[:nfiles]:
                 mtime=self.getepoch_path(p)#os.path.getmtime(p)
                 if p in existpaths and existmtimes[existpaths.index(p)]==mtime:
@@ -1210,19 +1210,19 @@ class echemvisDialog(QDialog):
             return eval (s.partition('Epoch=')[2].partition('\n')[0].strip())
         except:
             return 0.
-    
+
     def calcandplotwithupdate(self, ext='.txt'):
         self.calcandplot(ext='.txt', dbupdate=True)
-        
+
     def calcandplot(self, ext='.txt', dbupdate=False):
         self.get_techniquedictlist(ext=ext, dbupdate=dbupdate)
-        
+
         self.CalcAllFOM()
 #        for i, d in enumerate(self.techniquedictlist):
 #            self.selectind=i
-#            #if not 'FOM' in d.keys(): 
+#            #if not 'FOM' in d.keys():
 #            d['FOM']=self.CalcFOM()
-        
+
         i0=self.ternskipComboBox.currentIndex()
         if len(self.techniquedictlist)>0: #and updateexcludebool
             self.ternskipComboBox.clear()
@@ -1233,12 +1233,12 @@ class echemvisDialog(QDialog):
         self.statusLineEdit.setText('idle')
         self.plot()
         self.writefileauto()#writes files if dbdatasource==2, which means source is on K:
-        
+
 
     def plot(self):
         self.statusLineEdit.setText('plotting')
         s=25
-        
+
         self.plotw_tern.axes.cla()
         self.plotw_quat.axes.cla()
         self.plotw_plate.axes.cla()
@@ -1246,14 +1246,14 @@ class echemvisDialog(QDialog):
         self.cbax_quat.cla()
         self.cbax_tern.cla()
         self.cbax_plate.cla()
-        
+
         if len(self.techniquedictlist)==0:
             self.statusLineEdit.setText('idle')
             return
 #        m=self.plotw_tern.axes.scatter(self.detx, self.detz, c=self.dsp, s=s, edgecolors='none')
 #        cb=self.plotw_tern.fig.colorbar(m, cax=self.cbax_tern)
 #        cb.set_label('d-spacing (nm)')
-        
+
         getarr=lambda k:getarrfromkey(self.techniquedictlist, k)
         fom=getarr('FOM')
         print fom[:10]
@@ -1267,12 +1267,12 @@ class echemvisDialog(QDialog):
         comps=getarr('compositions')[inds]
         x=getarr('x')[inds]
         y=getarr('y')[inds]
-        
+
         if self.revcmapCheckBox.isChecked():
             cmap=cm.jet_r
         else:
             cmap=cm.jet
-        
+
         clip=True
         skipoutofrange=[False, False]
         self.vmin=fom.min()
@@ -1300,13 +1300,13 @@ class echemvisDialog(QDialog):
                         clip=False
                     except:
                         print 'color entry not understood:', vstr
-                
+
             except:
                 pass
-        
+
         norm=colors.Normalize(vmin=self.vmin, vmax=self.vmax, clip=clip)
         print 'fom min, max, mean, std:', fom.min(), fom.max(), fom.mean(), fom.std()
-        
+
         print 'skipoutofrange', skipoutofrange
         print len(fom)
         if skipoutofrange[0]:
@@ -1323,14 +1323,14 @@ class echemvisDialog(QDialog):
             x=x[inds]
             y=y[inds]
         print len(fom)
-        
-        
+
+
         if numpy.any(fom>self.vmax):
             if numpy.any(fom<self.vmin):
                 extend='both'
             else:
                 extend='max'
-        elif numpy.any(fom<self.vmin): 
+        elif numpy.any(fom<self.vmin):
             extend='min'
         else:
             extend='neither'
@@ -1341,11 +1341,11 @@ class echemvisDialog(QDialog):
             self.plotw_plate.axes.set_ylim(y.min()-1, y.max()+1)
         else:
             self.plotw_plate.axes.set_aspect(1.)
-        
+
         cb=self.plotw_plate.fig.colorbar(m, cax=self.cbax_plate, extend=extend, format=autocolorbarformat((fom.min(), fom.max())))
         #cb.set_label('|Q| (1/nm)')
-        
-        
+
+
         comps=numpy.array([c[:4]/c[:4].sum() for c in comps])
         i=self.ternskipComboBox.currentIndex()
         inds=[j for j in range(4) if j!=i][:3]
@@ -1353,33 +1353,33 @@ class echemvisDialog(QDialog):
         reordercomps=comps[:, inds+[i]]
         self.ellabels=self.techniquedictlist[0]['elements']
         reorderlabels=[self.ellabels[j] for j in inds+[i]]
-        
-        
+
+
         quat=QuaternaryPlot(self.plotw_quat.axes, ellabels=self.ellabels, offset=0)
         quat.label()
         quat.scatter(comps, c=fom, s=s, cmap=cmap, vmin=self.vmin, vmax=self.vmax)
         cb=self.plotw_quat.fig.colorbar(quat.mappable, cax=self.cbax_quat, extend=extend, format=autocolorbarformat((fom.min(), fom.max())))
-        
+
         fomlabel=''.join((str(self.expmntLineEdit.text()), str(self.calcoptionComboBox.currentText()), self.filterfomstr))
         self.stackedternplotdict=dict([('comps', reordercomps), ('fom', fom), ('cmap', cmap), ('norm', norm), ('ellabels', reorderlabels), ('fomlabel', fomlabel)])
-        
+
         tern=TernaryPlot(self.plotw_tern.axes, ellabels=reorderlabels[:3], offset=0)
         tern.label()
         tern.scatter(terncomps, c=fom, s=s, cmap=cmap, vmin=self.vmin, vmax=self.vmax)
         cb=self.plotw_tern.fig.colorbar(tern.mappable, cax=self.cbax_tern, extend=extend, format=autocolorbarformat((fom.min(), fom.max())))
-        
+
         self.plotw_aux.axes.plot(fom, 'g.-')
         self.plotw_aux.axes.set_xlabel('sorted by experiment time')
         self.plotw_aux.axes.set_ylabel('FOM')
         autotickformat(self.plotw_aux.axes, x=0, y=1)
-        
+
         self.plotw_quat.axes.mouse_init()
         self.plotw_quat.axes.set_axis_off()
         self.plotw_tern.fig.canvas.draw()
         self.plotw_quat.fig.canvas.draw()
         self.plotw_plate.fig.canvas.draw()
         self.plotw_aux.fig.canvas.draw()
-        
+
         self.selectind=-1
         self.plotselect()
         self.statusLineEdit.setText('idle')
@@ -1388,10 +1388,10 @@ class echemvisDialog(QDialog):
         d=self.stackedternplotdict
         self.echem10=echem10axesWidget(parent=self.parent, ellabels=d['ellabels'])
         self.echem10.plot(d, cb=True)
-        
+
         #scatter_10axes(d['comps'], d['fom'], self.echem10.stpl, s=18, edgecolors='none', cmap=d['cmap'], norm=d['norm'])
         self.echem10.exec_()
-    
+
     def stackedtern100window(self):
         d=self.stackedternplotdict
         self.echem100=echem100axesWidget(parent=None, ellabels=d['ellabels'])
@@ -1400,7 +1400,7 @@ class echemvisDialog(QDialog):
         #scatter_30axes(d['comps'], d['fom'], self.echem30.stpl, s=18, edgecolors='none', cmap=d['cmap'], norm=d['norm'])
         #self.echem30.show()
         self.echem100.exec_()
-        
+
     def stackedtern30window(self):
         d=self.stackedternplotdict
         self.echem30=echem30axesWidget(parent=None, ellabels=d['ellabels'])
@@ -1433,10 +1433,10 @@ class echemvisDialog(QDialog):
         if not overlaybool:
             self.plotw_select.axes.cla()
         d=self.techniquedictlist[self.selectind]
-        
+
         xk=str(self.xplotchoiceComboBox.currentText())
         yk=str(self.yplotchoiceComboBox.currentText())
-        
+
         xshift=0.
         xmult=1.
         yshift=0.
@@ -1453,7 +1453,7 @@ class echemvisDialog(QDialog):
         if '*Is' in yk:
             ymult=self.IsSpinBox.value()
             yk=yk.replace('*Is', '')
-            
+
         if not xk in d.keys():
             print 'cannot plot the selected x-y graph because %s not found' %xk
             return
@@ -1516,7 +1516,7 @@ class echemvisDialog(QDialog):
                 idlist+=[d['Sample']]
         if len(idlist)>0:
             self.addtoselectsamples(idlist)
-            
+
     def selectbetween(self):
         try:
             vmin, vmax=(self.vmin, self.vmax)
@@ -1528,7 +1528,7 @@ class echemvisDialog(QDialog):
                 idlist+=[d['Sample']]
         if len(idlist)>0:
             self.addtoselectsamples(idlist)
-            
+
     def selectabove(self):
         try:
             vmin, vmax=(self.vmin, self.vmax)
@@ -1540,13 +1540,13 @@ class echemvisDialog(QDialog):
                 idlist+=[d['Sample']]
         if len(idlist)>0:
             self.addtoselectsamples(idlist)
-            
+
     def addtoselectsamples(self, idlist):
         instr=str(self.selectsamplesLineEdit.text()).strip().split(',')
         instr+=[`n` for n in idlist if len(`n`)>0]
         s=','.join(instr).strip().strip(',').strip()
         self.selectsamplesLineEdit.setText(s)
-        
+
     def writesamplelist(self, p=None, explab='selectsamples'):
         self.statusLineEdit.setText('writing file')
         idstr=str(self.selectsamplesLineEdit.text()).split(',')
@@ -1569,13 +1569,13 @@ class echemvisDialog(QDialog):
         ids=list(set(ids))
         ids.sort()
         savestr='\n'.join([`n` for n in ids])
-        
+
         f=open(p, mode='w')
         f.write(savestr)
         f.close()
-        
+
         self.statusLineEdit.setText('idle')
-        
+
     def writefomfile_txt(self, p=None, explab=None, savedlist=False):
         self.statusLineEdit.setText('writing file')
         if len(self.techniquedictlist)==0:
@@ -1591,10 +1591,11 @@ class echemvisDialog(QDialog):
         if not p:
             print 'save aborted'
             return
-            
+
         labels=['Sample', 'x(mm)', 'y(mm)']
         labels+=self.techniquedictlist[0]['elements']
         labels+=[explab]
+        labels+=['Date', 'Time']
         kv_fmt=[('Sample', '%d'), ('x', '%.2f'), ('y', '%.2f'), ('compositions', '%.4f'), ('FOM', '%.6e')]
         arr=[]
         for d in self.techniquedictlist:
@@ -1606,19 +1607,22 @@ class echemvisDialog(QDialog):
                         arr2+=[fmt %subv]
                 else:
                     arr2+=[fmt %v]
+            structtime=d['mtime']-2082844800
+            arr2+=[time.strftime("%Y-%m-%d",time.localtime(structtime))]
+            arr2+=[time.strftime("%H:%M:%S",time.localtime(structtime))]
             arr+=['\t'.join(arr2)]
         s='\t'.join(labels)+'\n'
         s+='\n'.join(arr)
-        
+
         f=open(p, mode='w')
         f.write(s)
         f.close()
-        
+
         if savedlist:
             f=open(p[:-4]+'_dlist.pck', mode='w')
             pickle.dump(self.techniquedictlist, f)
             f.close()
-        
+
         self.statusLineEdit.setText('idle')
     def writefomfile_csv(self, p=None, explab=None, savedlist=False):
         self.statusLineEdit.setText('writing file')
@@ -1635,7 +1639,7 @@ class echemvisDialog(QDialog):
         if not p:
             print 'save aborted'
             return
-            
+
         labels=['sample_no']
         labels+=[explab]
         kv_fmt=[('Sample', '%d'), ('FOM', '%.5e')]
@@ -1653,20 +1657,20 @@ class echemvisDialog(QDialog):
         s=','.join(labels)+'\n'
         s+='\n'.join(arr)
         s=s.replace('nan', 'NaN')
-        
+
         desc=str(self.measdescLineEdit.text()).strip().replace('"', '')
         if len(desc)>0:
             s='#description = "'+desc+'"\n'+s
-        
+
         f=open(p, mode='w')
         f.write(s)
         f.close()
-        
+
         if savedlist:
             f=open(p[:-4]+'_dlist.pck', mode='w')
             pickle.dump(self.techniquedictlist, f)
             f.close()
-        
+
         self.statusLineEdit.setText('idle')
     def writefileauto(self, folder=None, explab=None):
         self.statusLineEdit.setText('writing file')
@@ -1675,7 +1679,7 @@ class echemvisDialog(QDialog):
             return
         if explab is None:
             explab=''.join((str(self.expmntLineEdit.text()), str(self.calcoptionComboBox.currentText()), self.filterfomstr))
-        
+
         #try to get plate id from folder name; if successful (finds a string of digits) and dbdatasource=2, create folder in K: experiments; works on *nix and Windows, untested on OSX
         #idfromfolder=os.path.split(self.folderpath)[1].rsplit('_',1)[1].split(' ',1)[0]
         folderstrings=os.path.split(self.folderpath)[1].split('_')
@@ -1709,37 +1713,37 @@ class echemvisDialog(QDialog):
                     break
         else:
             return
-        
+
         if not os.path.isdir(txtfolder):
             try:
                 os.mkdir(txtfolder)
             except:
                 print 'cannot autosave because unable to make directory ', txtfolder
-                txtfolder=None                            
+                txtfolder=None
         if not txtfolder is None:
             txtp=os.path.join(txtfolder, os.path.split(self.folderpath)[1]+'_'+explab+'.txt')
             print 'autosaving ', txtp
             self.writefomfile_txt(p=txtp, explab=explab, savedlist=False)
-        
+
         if not os.path.isdir(csvfolder):
             try:
                 os.mkdir(csvfolder)
             except:
                 print 'cannot autosave because unable to make directory ', csvfolder
-                csvfolder=None                            
+                csvfolder=None
         if not csvfolder is None:
             csvp=os.path.join(csvfolder, idfromfolder+'-'+explab+'-EcVisAuto.csv')
             print 'autosaving ', csvp
             self.writefomfile_csv(p=csvp, explab=explab, savedlist=False)
-            
-        
+
+
 
 class messageDialog(QDialog):
     def __init__(self, parent=None, title=''):
         super(messageDialog, self).__init__(parent)
         self.setWindowTitle(title)
         mainlayout=QGridLayout()
-  
+
         self.buttonBox = QDialogButtonBox(self)
         self.buttonBox.setGeometry(QRect(520, 195, 160, 26))
         self.buttonBox.setOrientation(Qt.Horizontal)
@@ -1747,22 +1751,22 @@ class messageDialog(QDialog):
         QObject.connect(self.buttonBox, SIGNAL("accepted()"), self.accept)
         QObject.connect(self.buttonBox, SIGNAL("rejected()"), self.reject)
         mainlayout.addWidget(self.buttonBox, 0, 0)
-    
+
         QObject.connect(self.buttonBox,SIGNAL("accepted()"),self.ExitRoutine)
     def ExitRoutine(self):
         return
-        
+
 class plotwidget(FigureCanvas):
     def __init__(self, parent, width=12, height=6, dpi=72, projection3d=False):
 
         #plotdata can be 2d array for image plot or list of 2 1d arrays for x-y plot or 2d array for image plot or list of lists of 2 1D arrays
-        
+
         self.fig=Figure(figsize=(width, height), dpi=dpi)
         if projection3d:
             self.axes=self.fig.add_subplot(111, navigate=True, projection='3d')
         else:
             self.axes=self.fig.add_subplot(111, navigate=True)
-        
+
         self.axes.hold(True)
         FigureCanvas.__init__(self, self.fig)
         self.setParent(parent)
@@ -1771,15 +1775,13 @@ class plotwidget(FigureCanvas):
         FigureCanvas.updateGeometry(self)
         #NavigationToolbar(self, parent)
         NavigationToolbar(self, self)
-        
+
         self.mpl_connect('button_press_event', self.myclick)
         self.clicklist=[]
-    
+
     def myclick(self, event):
         if not (event.xdata is None or event.ydata is None):
             arrayxy=[event.xdata, event.ydata]
             print 'clicked on image: array indeces ', arrayxy, ' using button', event.button
             self.clicklist+=[arrayxy]
             self.emit(SIGNAL("genericclickonplot"), [event.xdata, event.ydata, event.button])
-
-
