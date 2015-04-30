@@ -78,7 +78,7 @@ sys.path.append(os.path.join(PyCodePath,'JCAPPyDBComm'))
 try:
     from mysql_dbcommlib import *
 except:
-    print 'JCAPPyDBComm not found, do not use option 0'
+    print 'JCAPPyDBComm not found, do not use option 1'
     pass
 
 sys.path.append(os.path.join(PyCodePath, 'PythonCodeSecureFiles'))
@@ -1595,7 +1595,7 @@ class echemvisDialog(QDialog):
         labels=['Sample', 'x(mm)', 'y(mm)']
         labels+=self.techniquedictlist[0]['elements']
         labels+=[explab]
-        labels+=['Date', 'Time']
+        #labels+=['Date', 'Time']
         kv_fmt=[('Sample', '%d'), ('x', '%.2f'), ('y', '%.2f'), ('compositions', '%.4f'), ('FOM', '%.6e')]
         arr=[]
         for d in self.techniquedictlist:
@@ -1607,9 +1607,9 @@ class echemvisDialog(QDialog):
                         arr2+=[fmt %subv]
                 else:
                     arr2+=[fmt %v]
-            structtime=d['mtime']-2082844800
-            arr2+=[time.strftime("%Y-%m-%d",time.localtime(structtime))]
-            arr2+=[time.strftime("%H:%M:%S",time.localtime(structtime))]
+            #structtime=d['mtime']-2082844800
+            #arr2+=[time.strftime("%Y-%m-%d",time.localtime(structtime))]
+            #arr2+=[time.strftime("%H:%M:%S",time.localtime(structtime))]
             arr+=['\t'.join(arr2)]
         s='\t'.join(labels)+'\n'
         s+='\n'.join(arr)
@@ -1695,7 +1695,22 @@ class echemvisDialog(QDialog):
                     break
             else:
                 idsuffices=[folderstrings[-i-1]]+idsuffices
-        exptypes=('eche', 'ecqe')
+        #try again using parent directory
+        if idfromfolder is None:
+            folderstrings=os.path.split(os.path.split(self.folderpath)[0])[1].split('_')
+            idfromfolder=None
+            idsuffices=[]
+            for i in range(len(folderstrings)):
+                fs=folderstrings[-i-1].split(' ')[0]
+                if fs.isdigit():
+                    fslist=map(int, list(fs))
+                    checksum=sum(fslist[0:len(fslist)-1]) % 10 is fslist[-1]
+                    if checksum:
+                        idfromfolder=' '.join([folderstrings[-i-1]]+idsuffices)
+                        break
+                else:
+                    idsuffices=[folderstrings[-i-1]]+idsuffices
+        exptypes=('eche', 'ecqe', 'ECHE', 'ECQE')
         if idfromfolder is None:
             print 'cannot autosave due to lack of serial number'
             return
@@ -1706,11 +1721,13 @@ class echemvisDialog(QDialog):
             txtfolder=folder
             csvfolder=folder
         elif self.dbdatasource is 2:
-            for exp in exptypes:
-                if exp in self.folderpath:
-                    txtfolder=os.path.join(self.kexperiments, exp, 'fom_data', idfromfolder)
-                    csvfolder=os.path.join(self.kexperiments, exp, 'csv')
-                    break
+            txtfolder=os.path.join(self.kexperiments, 'eche', 'fom_data', idfromfolder)
+            csvfolder=os.path.join(self.kexperiments, 'eche', 'csv')
+#            for exp in exptypes:
+#                if exp in self.folderpath:
+#                    txtfolder=os.path.join(self.kexperiments, exp.lower(), 'fom_data', idfromfolder)
+#                    csvfolder=os.path.join(self.kexperiments, exp.lower(), 'csv')
+#                    break
         else:
             return
 
