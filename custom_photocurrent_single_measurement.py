@@ -18,6 +18,8 @@ import pickle
 from echem_plate_math import *
 from echem_plate_fcns import *
 
+
+
 PyCodePath=os.path.split(os.path.split(os.path.realpath(__file__))[0])[0]
 
 from matplotlib.ticker import FuncFormatter
@@ -25,7 +27,25 @@ from matplotlib.ticker import ScalarFormatter
 
 matplotlib.rcParams['backend.qt4'] = 'PyQt4'
 
+def myexpformat_2digs(x, pos):
+    return '%.2e' %x
 
+ExpTickLabels=FuncFormatter(myexpformat_2digs)
+RegTickLabels=matplotlib.ticker.ScalarFormatter()
+
+def autotickformat(ax, x=False, y=False, ndec=3):
+    for bl, xax, lims in zip([x, y], [ax.xaxis, ax.yaxis], [ax.get_xlim(), ax.get_ylim()]):
+        if bl:
+            try:
+                doit=numpy.max(numpy.log10(numpy.abs(numpy.array(lims))))<(-ndec)
+                doit=doit or numpy.min(numpy.log10(numpy.abs(numpy.array(lims))))>ndec
+            except:
+                print 'error on axis formatter for lims ', lims
+                continue
+            if doit:
+                xax.set_major_formatter(ExpTickLabels)
+            else:
+                xax.set_major_formatter(RegTickLabels)
 class messageDialog(QDialog):
     def __init__(self, parent=None, title=''):
         super(messageDialog, self).__init__(parent)
@@ -161,10 +181,12 @@ class tempDialog(QDialog):
         self.plotw_0=plotwidget(self)
         self.plotw_1=plotwidget(self)
         self.plotw_2=plotwidget(self)
-#        self.plotw_0.axes.set_xlabel('')
-#        self.plotw_0.axes.set_ylabel('')
-        #self.plotw_0.axes.set_aspect(1)
+        self.plotw_3=plotwidget(self)
 
+        self.plotw_0.fig.subplots_adjust(left=.2)
+        self.plotw_1.fig.subplots_adjust(left=.2)
+        self.plotw_2.fig.subplots_adjust(left=.2)
+        self.plotw_3.fig.subplots_adjust(left=.2)
 
 
 #in options, always make an option that does not require user input at index 0
@@ -220,42 +242,53 @@ class tempDialog(QDialog):
         QObject.connect(updateButton, SIGNAL("pressed()"), self.calcandplot)
 
         saveButton=QPushButton()
-        saveButton.setText("save FOM\nspreadhseet")
-        QObject.connect(saveButton, SIGNAL("pressed()"), self.writefomfile_txt)
+        saveButton.setText("save\nspreadhseet")
+        QObject.connect(saveButton, SIGNAL("pressed()"), self.writeillumtxt)
 
         paramsButton=QPushButton()
         paramsButton.setText("edit params")
         QObject.connect(paramsButton, SIGNAL("pressed()"), self.getcalcparams)
-
-
+        
+        addButton=QPushButton()
+        addButton.setText("add to\nfig 4")
+        QObject.connect(addButton, SIGNAL("pressed()"), self.addplot)
+        
+        self.labelLineEdit=QLineEdit()
+        self.overlayselectCheckBox=QCheckBox()
+        self.overlayselectCheckBox.setText("overlay")
+        
         savebuttonlayout=QHBoxLayout()
         savebuttonlayout.addWidget(folderButton)
         savebuttonlayout.addWidget(paramsButton)
         savebuttonlayout.addWidget(updateButton)
         savebuttonlayout.addWidget(saveButton)
+        savebuttonlayout.addWidget(addButton)
+        savebuttonlayout.addWidget(self.labelLineEdit)
+        savebuttonlayout.addWidget(self.overlayselectCheckBox)
 
 
 
         mainlayout=QGridLayout()
-        mainlayout.addLayout(savebuttonlayout, 0, 0)
+        mainlayout.addLayout(savebuttonlayout, 0, 0, 1, 2)
 
-        mainlayout.addWidget(self.plotw_0, 0, 1)
-        mainlayout.addWidget(self.plotw_1, 1, 0)
-        mainlayout.addWidget(self.plotw_2, 1, 1)
+        mainlayout.addWidget(self.plotw_0, 1, 0)
+        mainlayout.addWidget(self.plotw_1, 1,1)
+        mainlayout.addWidget(self.plotw_2, 2, 0)
+        mainlayout.addWidget(self.plotw_3, 2, 1)
 
 
 
         self.setLayout(mainlayout)
         
-        self.resize(1000, 550)
+        self.resize(1100, 850)
         self.selectfile()
         self.getcalcparams()
-
+        self.calcandplot()
 
     def selectfile(self, plate_id=None, selectexids=None, folder=None):
 
-        p=mygetopenfile(self, markstr='select folder for saving results')
-        self.techdict=readechemtxt(p)
+        self.p=mygetopenfile(self, markstr='select CA photo .txt file')
+        self.techdict=readechemtxt(self.p)
 
     def getcalcparams(self):
         i=2
@@ -329,6 +362,7 @@ class tempDialog(QDialog):
         self.plotw_0.axes.plot(self.techdict['t(s)'], self.techdict['I(A)'],'b.-')
         self.plotw_0.axes.set_xlabel('t(s)')
         self.plotw_0.axes.set_ylabel('I(A)')
+        autotickformat(self.plotw_0.axes, x=0, y=1)
         self.plotw_0.fig.canvas.draw()
         
         self.plotw_1.axes.cla()
@@ -337,63 +371,51 @@ class tempDialog(QDialog):
         self.plotw_1.axes.plot(self.techdict['t(s)_ill'], self.techdict['I(A)_ill'],'k.')
         self.plotw_1.axes.set_xlabel('t(s)')
         self.plotw_1.axes.set_ylabel('I(A)')
+        autotickformat(self.plotw_1.axes, x=0, y=1)
         self.plotw_1.fig.canvas.draw()
         
         self.plotw_2.axes.cla()
         self.plotw_2.axes.plot(self.techdict['t(s)_ill'], self.techdict['I(A)_illdiff'],'k.-')
         self.plotw_2.axes.set_xlabel('t(s)')
         self.plotw_2.axes.set_ylabel('Iphoto(A)')
+        autotickformat(self.plotw_2.axes, x=0, y=1)
         self.plotw_2.fig.canvas.draw()
+    
         
-    def writefomfile_txt(self, p=None, explab=None, savedlist=False):
-        self.statusLineEdit.setText('writing file')
-        if len(self.techniquedictlist)==0:
-            print 'no data to save'
-            return
-        if explab is None:
-            explab=''.join((str(self.expmntLineEdit.text()), str(self.calcoptionComboBox.currentText()), self.filterfomstr))
+    def addplot(self):
+        lab=str(self.labelLineEdit.text())
+        if not self.overlayselectCheckBox.isChecked():
+            self.plotw_3.axes.cla()
+        self.plotw_3.axes.plot(self.techdict['t(s)_ill'], self.techdict['I(A)_illdiff'],'.-', label=lab)
+        self.plotw_3.axes.set_xlabel('t(s)')
+        self.plotw_3.axes.set_ylabel('Iphoto(A)')
+        autotickformat(self.plotw_3.axes, x=0, y=1)
+        self.plotw_3.axes.legend(loc=0).draggable()
+        self.plotw_3.fig.canvas.draw()
+    def writeillumtxt(self, p=None, explab=None, saved=False):
+
         if p is None:
-            p=mygetsavefile(parent=self, markstr='save spreadsheet string', filename=os.path.split(self.folderpath)[1]+'_'+explab+'.txt', xpath=self.kexperiments)
-        elif os.path.isdir(p):
-            p=os.path.join(p, os.path.split(self.folderpath)[1]+'_'+explab+'.txt')
-            print p
+            p=mygetsavefile(parent=self, markstr='save spreadsheet of dark and illum photocurrent', xpath=self.p)
+
         if not p:
             print 'save aborted'
             return
 
-        labels=['Sample', 'x(mm)', 'y(mm)']
-        labels+=self.techniquedictlist[0]['elements']
-        labels+=[explab]
-        #labels+=['Date', 'Time']
-        kv_fmt=[('Sample', '%d'), ('x', '%.2f'), ('y', '%.2f'), ('compositions', '%.4f'), ('FOM', '%.6e')]
-        arr=[]
-        for d in self.techniquedictlist:
-            arr2=[]
-            for k, fmt in kv_fmt:
-                v=d[k]
-                if isinstance(v, numpy.ndarray) or isinstance(v, list):
-                    for subv in v:
-                        arr2+=[fmt %subv]
-                else:
-                    arr2+=[fmt %v]
-            #structtime=d['mtime']-2082844800
-            #arr2+=[time.strftime("%Y-%m-%d",time.localtime(structtime))]
-            #arr2+=[time.strftime("%H:%M:%S",time.localtime(structtime))]
-            arr+=['\t'.join(arr2)]
-        s='\t'.join(labels)+'\n'
-        s+='\n'.join(arr)
-
+        labels=['t(s)_dark', 'I(A)_dark', 't(s)_ill', 'I(A)_ill', 'I(A)_illdiff']
+        lines=['%column_headings='+'\t'.join(labels)]
+        lines+=['\t'.join(tup) for tup in zip(*[['%.3e' %v for v in self.techdict[k]] for k in labels])]
+        s='\n'.join(lines)
+        
         f=open(p, mode='w')
         f.write(s)
         f.close()
 
-        if savedlist:
-            f=open(p[:-4]+'_dlist.pck', mode='w')
-            pickle.dump(self.techniquedictlist, f)
+        if saved:
+            f=open(p[:-4]+'.pck', mode='w')
+            pickle.dump(self.techdict, f)
             f.close()
 
-        self.statusLineEdit.setText('idle')
-    
+
 
 
 class messageDialog(QDialog):
